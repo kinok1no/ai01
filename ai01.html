@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI活用推進チーム キックオフミーティング</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            color: #334155; /* Darker text color */
+        }
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .header-gradient {
+            background: linear-gradient(to right, #6366f1, #8b5cf6); /* Purple-blue gradient */
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(to right, #6366f1, #8b5cf6);
+        }
+
+        /* --- ここからアニメーションのスタイルを追加 --- */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* アニメーションを適用する要素の初期状態を透明にし、アニメーションの準備をする */
+        .fade-in-on-load {
+            opacity: 0; /* 初期状態は透明 */
+            animation-fill-mode: forwards; /* アニメーション終了後、最後の状態を維持 */
+        }
+
+        .animate-header {
+            animation-name: fadeInDown;
+            animation-duration: 0.7s;
+            animation-timing-function: ease-out;
+        }
+
+        .animate-card {
+            animation-name: fadeInUp;
+            animation-duration: 0.7s;
+            animation-timing-function: ease-out;
+        }
+
+        /* 遅延クラス */
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+        .delay-500 { animation-delay: 500ms; }
+        .delay-600 { animation-delay: 600ms; }
+        /* --- アニメーションのスタイルはここまで --- */
+    </style>
+</head>
+<body class="antialiased">
+    <div class="min-h-screen flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <header class="w-full max-w-4xl header-gradient text-white py-8 px-6 rounded-3xl shadow-lg mb-8 text-center fade-in-on-load animate-header">
+            <h1 class="text-4xl sm:text-5xl font-extrabold mb-2">
+                AI活用推進チーム
+            </h1>
+            <p class="text-xl sm:text-2xl font-medium">
+                キックオフミーティング
+            </p>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="w-full max-w-4xl">
+            <!-- 1. チームの目的とビジョン -->
+            <section class="section-card fade-in-on-load animate-card delay-200">
+                <h2 class="text-3xl font-bold mb-4 text-gradient">1. チームの目的とビジョン</h2>
+                <ul class="list-disc pl-6 space-y-2 text-lg">
+                    <li><strong class="font-semibold">設立背景:</strong> なぜ今、AI活用推進チームが必要なのか、会社全体としてのAI活用の重要性を伝えます。</li>
+                    <li><strong class="font-semibold">チームのミッション:</strong> 具体的にどのような課題を解決し、どのような価値を創造するのかを言語化して共有します。「業務効率化」「新たなサービス開発」「データに基づく意思決定の強化」など、具体的なキーワードを挙げると良いでしょう。</li>
+                    <li><strong class="font-semibold">ビジョン:</strong> チームが成功した未来の姿を描き、メンバーが共感できるようなワクワクするビジョンを提示します。</li>
+                </ul>
+            </section>
+
+            <!-- 2. チーム体制と役割分担 -->
+            <section class="section-card fade-in-on-load animate-card delay-300">
+                <h2 class="text-3xl font-bold mb-4 text-gradient">2. チーム体制と役割分担</h2>
+                <ul class="list-disc pl-6 space-y-2 text-lg">
+                    <li><strong class="font-semibold">メンバー紹介:</strong> 各メンバーの所属部署、氏名、簡単な自己紹介（AIに関する経験や興味など）をしてもらい、お互いを知る機会とします。</li>
+                    <li><strong class="font-semibold">チーム組織図:</strong> リーダーであるあなたの役割と、各メンバーに期待する役割（例えば、各部署との連携担当、技術調査担当、PoC推進担当など）について説明します。現時点での暫定的なものでも構いません。</li>
+                    <li><strong class="font-semibold">コミュニケーション方法:</strong> 普段の連絡手段（チャットツール、メールなど）、定例ミーティングの頻度と時間などを決定します。</li>
+                </ul>
+            </section>
+
+            <!-- 3. 今後の進め方とロードマップ -->
+            <section class="section-card fade-in-on-load animate-card delay-400">
+                <h2 class="text-3xl font-bold mb-4 text-gradient">3. 今後の進め方とロードマップ</h2>
+                <ul class="list-disc pl-6 space-y-2 text-lg">
+                    <li><strong class="font-semibold">短期的な目標:</strong> 直近で何を達成するのか（例：AI活用事例の調査、各部署のニーズヒアリング、PoCテーマの選定など）。</li>
+                    <li><strong class="font-semibold">中長期的なロードマップ:</strong> 大まかなスケジュール感（例：半年後の目標、1年後の目標など）を提示します。具体的なプロジェクトがまだ見えていなくても、フェーズ分けをして説明すると良いでしょう。</li>
+                    <li><strong class="font-semibold">推進体制と意思決定プロセス:</strong> どのようなプロセスでプロジェクトを進め、どのような基準で意思決定を行うのかを説明します。</li>
+                </ul>
+            </section>
+
+            <!-- 4. 期待することと協力のお願い -->
+            <section class="section-card fade-in-on-load animate-card delay-500">
+                <h2 class="text-3xl font-bold mb-4 text-gradient">4. 期待することと協力のお願い</h2>
+                <ul class="list-disc pl-6 space-y-2 text-lg">
+                    <li><strong class="font-semibold">積極的な意見交換:</strong> AI活用は正解がない分野であり、多様な視点からの意見が重要であることを伝えます。</li>
+                    <li><strong class="font-semibold">部署間の連携:</strong> 各部署の代表として参加していることを認識してもらい、自部署のニーズを吸い上げ、チームの成果を自部署に還元する役割を期待します。</li>
+                    <li><strong class="font-semibold">学習と情報共有:</strong> AIに関する最新情報のキャッチアップや、チーム内での情報共有の重要性を伝えます。</li>
+                    <li><strong class="font-semibold">成功事例の共有とナレッジ蓄積:</strong> 小さな成功でも積極的に共有し、ナレッジとして蓄積していくことの重要性を強調します。</li>
+                </ul>
+            </section>
+
+            <!-- 5. 質疑応答と意見交換 -->
+            <section class="section-card fade-in-on-load animate-card delay-600">
+                <h2 class="text-3xl font-bold mb-4 text-gradient">5. 質疑応答と意見交換</h2>
+                <ul class="list-disc pl-6 space-y-2 text-lg">
+                    <li><strong class="font-semibold">質問タイム:</strong> 上記の説明に対して疑問点がないか、自由に質問してもらう時間を設けます。</li>
+                    <li><strong class="font-semibold">意見交換:</strong> 今後のAI活用について、メンバーが考えていることや、期待することなどを自由に話してもらう時間を設けます。初回から全員が積極的に発言できなくても、まずは意見を引き出す姿勢を見せることが重要です。</li>
+                </ul>
+            </section>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="w-full max-w-4xl text-center text-gray-500 text-sm mt-8">
+            <p>&copy; <span id="current-year">2025</span> AI活用推進チーム. All rights reserved.</p>
+        </footer>
+    </div>
+    <script>
+        // フッターの年を動的に更新
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
