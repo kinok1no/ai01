@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI活用推進チーム</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SortableJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        html {
+            scroll-behavior: smooth; /* スムーズスクロールを有効化 */
+        }
+        /* Interフォントの読み込み */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* 薄いグレーの背景 */
+        }
+        /* カスタムスクロールバーのスタイル（オプション） */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #808080;
+        }
+
+        /* タイムラインのカスタムスタイル */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: #cbd5e0; /* light gray line */
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            border-radius: 2px;
+        }
+        .timeline-item {
+            padding: 10px 0;
+            position: relative;
+            width: 50%;
+            left: 0; /* Default for left side */
+        }
+        .timeline-item:nth-child(even) {
+            left: 50%; /* Right side */
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #6b7280; /* gray-500 for not-started status */
+            border: 4px solid #fff;
+            top: 20px;
+            border-radius: 50%;
+            z-index: 1;
+            transition: background-color 0.5s ease; /* 色の変更を滑らかに */
+        }
+        /* 進捗に応じた円の色 */
+        .timeline-item.status-in-progress::after {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .timeline-item.status-completed::after {
+            background-color: #16a34a; /* green-600 */
+        }
+        .timeline-item:nth-child(odd)::after {
+            right: -10px; /* Position circle for left item */
+        }
+        .timeline-item:nth-child(even)::after {
+            left: -10px; /* Position circle for right item */
+        }
+        .timeline-content {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 40px; /* Space for line and circle */
+        }
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 40px; /* Space for line and circle */
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px; /* Move line to left for mobile */
+            }
+            .timeline-item {
+                width: 100%;
+                left: 0 !important; /* All items on left */
+                padding-left: 50px; /* Space for circle */
+            }
+            .timeline-item::after {
+                left: 10px; /* Position circle for mobile */
+            }
+            .timeline-item .timeline-content {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        /* スクロールアニメーション用のスタイル */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 優先度インジケーター用のスタイル */
+        .task-row {
+            position: relative;
+            padding-left: 1.25rem; /* インジケーター用のスペース (pl-5) */
+            transition: background-color 0.2s ease-in-out;
+        }
+        .task-row::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem; /* left-2 */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            border-radius: 2px;
+            transition: background-color 0.3s ease;
+        }
+        .task-row.priority-high::before { background-color: #ef4444; } /* red-500 */
+        .task-row.priority-medium::before { background-color: #f59e0b; } /* amber-500 */
+        .task-row.priority-low::before { background-color: #22c55e; } /* green-500 */
+
+        /* ドラッグ＆ドロップ用のスタイル */
+        .task-row.dragging {
+            opacity: 0.5;
+            background: #eef2ff; /* indigo-50 */
+        }
+        .task-row.ghost {
+            opacity: 0.4;
+            background: #dbeafe; /* blue-100 */
+            border: 2px dashed #60a5fa; /* blue-400 */
+        }
+        .task-row.ghost > * {
+            visibility: hidden;
+        }
+
+        /* タスクテキスト編集中のスタイル */
+        .task-text[contenteditable="true"] {
+            outline: 1px solid #9ca3af; /* gray-400 */
+            background-color: #f9fafb; /* gray-50 */
+            cursor: text;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- ヘッダーセクション -->
+    <header class="bg-gradient-to-r from-slate-800 to-slate-700 text-white p-6 shadow-lg sticky top-0 z-20">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
+            <h1 class="text-4xl font-bold mb-2 md:mb-0">AI活用推進チーム</h1>
+            <nav>
+                <ul class="flex space-x-6 text-lg">
+                    <li><a href="#purpose-vision" class="hover:text-slate-300 transition duration-300">目的とビジョン</a></li>
+                    <li><a href="#roadmap" class="hover:text-slate-300 transition duration-300">ロードマップ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto p-6 space-y-12">
+
+        <!-- 目的とビジョンセクション -->
+        <section id="purpose-vision" class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 scroll-mt-24">
+            <h2 class="text-4xl font-extrabold text-center text-slate-800 mb-8">目的とビジョン</h2>
+
+            <!-- チームの目的 -->
+            <div class="mb-10">
+                <h3 class="text-3xl font-semibold text-slate-700 mb-6 border-b-2 border-slate-300 pb-2">チームの目的</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 fade-in-up">
+                        <h4 class="text-xl font-bold text-slate-800 mb-3">1. 業務効率の最大化と生産性向上</h4>
+                        <p class="text-gray-700">AI技術を導入・活用することで、定型業務の自動化、データ分析の高速化、意思決定の迅速化を図り、社員一人ひとりの生産性を向上させ、企業全体の業務効率を飛躍的に高めます。これにより、社員はより創造的で付加価値の高い業務に注力できるようになります。</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 fade-in-up" style="transition-delay: 150ms;">
+                        <h4 class="text-xl font-bold text-slate-800 mb-3">2. 新たな価値創造と競争力強化</h4>
+                        <p class="text-gray-700">AIを活用した新製品・新サービスの開発、顧客体験のパーソナライズ、市場トレンドの予測など、これまでになかった価値を創出します。これにより、市場における競争優位性を確立し、持続的な成長を可能にします。</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 fade-in-up" style="transition-delay: 300ms;">
+                        <h4 class="text-xl font-bold text-slate-800 mb-3">3. AIリテラシーの向上と企業文化の変革</h4>
+                        <p class="text-gray-700">社員全体のAIに対する理解と活用スキルを向上させ、AIを日常業務の一部として自然に受け入れられる企業文化を醸成します。これにより、全社的なイノベーションの推進力を高め、将来の変化に柔軟に対応できる組織を構築します。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- チームのビジョン -->
+            <div class="fade-in-up">
+                <h3 class="text-3xl font-semibold text-slate-700 mb-6 border-b-2 border-slate-300 pb-2">チームのビジョン</h3>
+                <div class="bg-blue-50 p-8 rounded-lg shadow-md text-center">
+                    <p class="text-2xl font-bold text-blue-800 leading-relaxed">
+                        「AIを全社的な”知のインフラ”とし、社員一人ひとりがAIを駆使して、より創造的で価値ある仕事を実現できる未来を創造する」
+                    </p>
+                    <p class="mt-4 text-gray-700">
+                        このビジョンは、AIが特定の部署や専門家だけのものではなく、全社員が当たり前のように活用する「知のインフラ」となることを目指しています。AIが業務を効率化するだけでなく、社員の創造性を刺激し、新たなアイデアや解決策を生み出すための強力なツールとなる未来を描いています。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ロードマップセクション -->
+        <section id="roadmap" class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 scroll-mt-24">
+            <h2 class="text-4xl font-extrabold text-center text-slate-800 mb-8">ロードマップ</h2>
+            <p class="text-gray-700 mb-10 text-center">このロードマップは、AI活用推進チームが段階的に成果を出し、最終的なビジョンを実現するための指針です。社内の状況に合わせて柔軟に調整してください。</p>
+
+            <div class="text-right mb-6">
+                <button id="export-csv-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md shadow-sm inline-flex items-center transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>CSVエクスポート</span>
+                </button>
+            </div>
+
+            <div class="timeline">
+                <!-- 短期ロードマップ 1 -->
+                <div class="timeline-item fade-in-up" data-roadmap-id="short-1">
+                    <div class="timeline-content bg-white">
+                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">短期ロードマップ 1（2025年8月〜2025年10月）</h3>
+                        <!-- 担当者と進捗状況 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-sm space-y-2 sm:space-y-0">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="font-medium text-gray-700 mr-1">担当:</span>
+                                <select data-main-assignee-select class="bg-gray-100 border-gray-300 text-gray-700 text-sm rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                                    <!-- Options will be inserted by JS -->
+                                </select>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700 mr-3 w-20 shrink-0 text-right" data-progress-text></span>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" data-progress-bar></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 my-4"></div>
+                        <p class="text-gray-700 mb-4">短期ロードマップの最初のフェーズでは、AI活用の初期基盤を構築し、ニーズと体制を確立します。</p>
+                        <!-- KPIとタスクリストのコンテナ -->
+                        <div class="mt-4 border-t pt-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">詳細タスクリスト</h4>
+                            <div data-task-container class="space-y-1">
+                                <!-- タスクはJavaScriptでここに挿入されます -->
+                            </div>
+                            <!-- タスク追加UI -->
+                            <div class="mt-4" data-add-task-ui>
+                                <div class="add-task-form hidden space-y-2 mt-2 p-2 border rounded-md bg-gray-50">
+                                    <input type="text" placeholder="新しいタスク名" class="w-full p-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="flex items-center gap-2">
+                                        <input type="date" class="p-2 border rounded-md text-sm flex-grow focus:ring-blue-500 focus:border-blue-500">
+                                        <button class="save-task-btn bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition-colors">保存</button>
+                                        <button class="cancel-add-task-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-300 transition-colors">キャンセル</button>
+                                    </div>
+                                </div>
+                                <button class="add-task-btn mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                    タスクを追加
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 短期ロードマップ 2 -->
+                <div class="timeline-item fade-in-up" data-roadmap-id="short-2">
+                    <div class="timeline-content bg-white">
+                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">短期ロードマップ 2（2025年11月〜2026年4月）</h3>
+                        <!-- 担当者と進捗状況 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-sm space-y-2 sm:space-y-0">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="font-medium text-gray-700 mr-1">担当:</span>
+                                <select data-main-assignee-select class="bg-gray-100 border-gray-300 text-gray-700 text-sm rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                                    <!-- Options will be inserted by JS -->
+                                </select>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700 mr-3 w-20 shrink-0 text-right" data-progress-text></span>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-gray-400 h-2.5 rounded-full transition-all duration-500" data-progress-bar></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 my-4"></div>
+                        <p class="text-gray-700 mb-4">短期ロードマップの次のフェーズでは、選定されたパイロットプロジェクトの実施と、社内リテラシーの向上に注力します。</p>
+                        <!-- KPIとタスクリストのコンテナ -->
+                        <div class="mt-4 border-t pt-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">詳細タスクリスト</h4>
+                            <div data-task-container class="space-y-1">
+                                <!-- タスクはJavaScriptでここに挿入されます -->
+                            </div>
+                            <!-- タスク追加UI -->
+                            <div class="mt-4" data-add-task-ui>
+                                <div class="add-task-form hidden space-y-2 mt-2 p-2 border rounded-md bg-gray-50">
+                                    <input type="text" placeholder="新しいタスク名" class="w-full p-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="flex items-center gap-2">
+                                        <input type="date" class="p-2 border rounded-md text-sm flex-grow focus:ring-blue-500 focus:border-blue-500">
+                                        <button class="save-task-btn bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition-colors">保存</button>
+                                        <button class="cancel-add-task-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-300 transition-colors">キャンセル</button>
+                                    </div>
+                                </div>
+                                <button class="add-task-btn mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                    タスクを追加
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 中期ロードマップ -->
+                <div class="timeline-item fade-in-up" data-roadmap-id="medium-1">
+                    <div class="timeline-content bg-white">
+                        <h3 class="text-2xl font-semibold text-sky-700 mb-3">中期ロードマップ（2026年5月〜2027年4月）</h3>
+                        <!-- 担当者と進捗状況 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-sm space-y-2 sm:space-y-0">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="font-medium text-gray-700 mr-1">担当:</span>
+                                <select data-main-assignee-select class="bg-gray-100 border-gray-300 text-gray-700 text-sm rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                                    <!-- Options will be inserted by JS -->
+                                </select>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700 mr-3 w-20 shrink-0 text-right" data-progress-text></span>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-gray-400 h-2.5 rounded-full transition-all duration-500" data-progress-bar></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 my-4"></div>
+                        <p class="text-gray-700 mb-4">中期では、短期での成功を基盤に、AI活用の範囲を広げ、より戦略的なAI導入を進めます。</p>
+                        <!-- KPIとタスクリストのコンテナ -->
+                        <div class="mt-4 border-t pt-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">詳細タスクリスト</h4>
+                            <div data-task-container class="space-y-1">
+                                <!-- タスクはJavaScriptでここに挿入されます -->
+                            </div>
+                            <!-- タスク追加UI -->
+                            <div class="mt-4" data-add-task-ui>
+                                <div class="add-task-form hidden space-y-2 mt-2 p-2 border rounded-md bg-gray-50">
+                                    <input type="text" placeholder="新しいタスク名" class="w-full p-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="flex items-center gap-2">
+                                        <input type="date" class="p-2 border rounded-md text-sm flex-grow focus:ring-blue-500 focus:border-blue-500">
+                                        <button class="save-task-btn bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition-colors">保存</button>
+                                        <button class="cancel-add-task-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-300 transition-colors">キャンセル</button>
+                                    </div>
+                                </div>
+                                <button class="add-task-btn mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                    タスクを追加
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 長期ロードマップ -->
+                <div class="timeline-item fade-in-up" data-roadmap-id="long-1">
+                    <div class="timeline-content bg-white">
+                        <h3 class="text-2xl font-semibold text-indigo-700 mb-3">長期ロードマップ（2027年5月〜）</h3>
+                        <!-- 担当者と進捗状況 -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-sm space-y-2 sm:space-y-0">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="font-medium text-gray-700 mr-1">担当:</span>
+                                <select data-main-assignee-select class="bg-gray-100 border-gray-300 text-gray-700 text-sm rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+                                    <!-- Options will be inserted by JS -->
+                                </select>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="font-medium text-gray-700 mr-3 w-20 shrink-0 text-right" data-progress-text></span>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div class="bg-gray-400 h-2.5 rounded-full transition-all duration-500" data-progress-bar></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 my-4"></div>
+                        <p class="text-gray-700 mb-4">長期では、AIが企業活動の中核となり、継続的なイノベーションを生み出す体制を確立します。</p>
+                        <!-- KPIとタスクリストのコンテナ -->
+                        <div class="mt-4 border-t pt-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">詳細タスクリスト</h4>
+                            <div data-task-container class="space-y-1">
+                                <!-- タスクはJavaScriptでここに挿入されます -->
+                            </div>
+                            <!-- タスク追加UI -->
+                            <div class="mt-4" data-add-task-ui>
+                                <div class="add-task-form hidden space-y-2 mt-2 p-2 border rounded-md bg-gray-50">
+                                    <input type="text" placeholder="新しいタスク名" class="w-full p-2 border rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="flex items-center gap-2">
+                                        <input type="date" class="p-2 border rounded-md text-sm flex-grow focus:ring-blue-500 focus:border-blue-500">
+                                        <button class="save-task-btn bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition-colors">保存</button>
+                                        <button class="cancel-add-task-btn bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm hover:bg-gray-300 transition-colors">キャンセル</button>
+                                    </div>
+                                </div>
+                                <button class="add-task-btn mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                                    タスクを追加
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- フッターセクション -->
+    <footer class="bg-slate-900 text-white p-6 mt-12">
+        <div class="container mx-auto text-center text-sm">
+            &copy; <span id="current-year">2025</span> AI活用推進チーム. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // フッターの年を動的に更新
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            // --- 担当者リスト ---
+            // このリストを編集すると、タスクの担当者選択肢に反映されます。
+            const teamMembers = [
+                // 個人
+                '高信', '井上', '翁長', '金子ミ', '森田あ', '杉浦', '成宮', '石村', '浅野', '竹井', '北島', '鈴木文', '濵﨑',
+                // 部署・チーム
+                '営業企画部', 'シスサポ部', 'CS課', 'TC課', 'システム部', '運営管理部', '日本の資格・検定事業部', '新規事業企画室',
+                // その他
+                '全員', '未定'
+            ];
+
+            // --- ローカルストレージキー ---
+            const LOCAL_STORAGE_KEY = 'aiRoadmapData';
+
+            // --- データの保存と読み込み ---
+            function saveDataToLocalStorage() {
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roadmapData));
+                } catch (e) {
+                    console.error("ローカルストレージへのデータ保存に失敗しました:", e);
+                }
+            }
+
+            function loadDataFromLocalStorage() {
+                const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (savedData) {
+                    try {
+                        return JSON.parse(savedData);
+                    } catch (e) {
+                        console.error("ローカルストレージのデータ解析に失敗しました:", e);
+                    }
+                }
+                // 保存されたデータがない、または解析に失敗した場合はデフォルトデータを返す
+                return [
+                    { 
+                        id: 'short-1', 
+                        mainAssignee: '企画部',
+                        tasks: [
+                            { text: '各部署へのヒアリング実施', completed: true, assignee: '田中', dueDate: '2025-08-15', priority: '高', comments: ['完了。議事録は共有済み。'], history: [] },
+                            { text: 'アンケート調査の設計と配布', completed: true, assignee: '鈴木', dueDate: '2025-08-20', priority: '高', comments: [], history: [] },
+                            { text: '課題リストの作成と優先順位付け', completed: false, assignee: '田中', dueDate: '2025-08-31', priority: '中', comments: ['8/25にドラフトをレビュー予定。'], history: [] },
+                            { text: 'チーム内の役割分担の明確化', completed: true, assignee: '全員', dueDate: '2025-08-10', priority: '中', comments: [], history: [] },
+                            { text: '社内ポータルサイトの開設', completed: false, assignee: '佐藤', dueDate: '2025-09-15', priority: '低', comments: [], history: [] },
+                        ]
+                    },
+                    { 
+                        id: 'short-2', 
+                        mainAssignee: 'IT推進部',
+                        tasks: [
+                            { text: 'パイロットプロジェクトのテーマ選定', completed: false, assignee: '未定', dueDate: '2025-11-30', priority: '高', comments: [], history: [] },
+                            { text: 'PoC（概念実証）の計画策定', completed: false, assignee: 'IT推進部', dueDate: '2025-12-15', priority: '中', comments: [], history: [] },
+                            { text: '社内セミナーの企画と告知', completed: false, assignee: '未定', dueDate: '2026-01-20', priority: '中', comments: [], history: [] },
+                        ]
+                    },
+                    { 
+                        id: 'medium-1', 
+                        mainAssignee: '全社横断チーム',
+                        tasks: [
+                            { text: '成功事例の横展開計画', completed: false, assignee: '全社横断チーム', dueDate: '2026-06-30', priority: '高', comments: [], history: [] },
+                            { text: 'データ収集基盤の要件定義', completed: false, assignee: '未定', dueDate: '2026-08-31', priority: '中', comments: [], history: [] },
+                            { text: '高度AI技術の調査開始', completed: false, assignee: '技術調査担当', dueDate: '2026-10-31', priority: '低', comments: [], history: [] },
+                        ]
+                    },
+                    { 
+                        id: 'long-1', 
+                        mainAssignee: '経営層',
+                        tasks: [
+                            { text: 'AIを活用した新規事業のアイデアソン実施', completed: false, assignee: '未定', dueDate: '2027-06-30', priority: '中', comments: [], history: [] },
+                            { text: 'AI倫理ガイドラインのドラフト作成', completed: false, assignee: '法務部', dueDate: '2027-09-30', priority: '中', comments: [], history: [] },
+                        ]
+                    },
+                ];
+            }
+
+            // --- ロードマップデータ ---
+            // タスクの完了状態、担当者、期限を変更すると、UIが自動で更新されます。
+            let roadmapData = loadDataFromLocalStorage();
+
+            // --- 履歴記録関数 ---
+            function addHistory(task, action, from, to) {
+                if (!task.history) {
+                    task.history = [];
+                }
+                const newHistory = {
+                    timestamp: new Date().toISOString(),
+                    action: action,
+                    from: from,
+                    to: to
+                };
+                task.history.unshift(newHistory); // 最新の履歴を先頭に追加
+            }
+
+            // 進捗状況を計算する関数
+            function calculateProgress(tasks) {
+                if (!tasks || tasks.length === 0) return { progress: 0, status: '未着手' };
+                const completedCount = tasks.filter(task => task.completed).length;
+                const progress = Math.round((completedCount / tasks.length) * 100);
+                let status = '進行中';
+                if (progress === 0) status = '未着手';
+                if (progress === 100) status = '完了';
+                return { progress, status };
+            }
+
+            // 特定のロードマップの表示を更新する関数
+            function updateRoadmapView(roadmapId) {
+                const roadmapItemData = roadmapData.find(item => item.id === roadmapId);
+                if (!roadmapItemData) return;
+
+                const { progress, status } = calculateProgress(roadmapItemData.tasks);
+
+                const roadmapElement = document.querySelector(`[data-roadmap-id="${roadmapId}"]`);
+                const textElement = roadmapElement.querySelector('[data-progress-text]');
+                const barElement = roadmapElement.querySelector('[data-progress-bar]');
+
+                textElement.textContent = progress > 0 ? `${status} (${progress}%)` : status;
+                barElement.style.width = `${progress}%`;
+
+                // 既存のクラスをリセット
+                roadmapElement.classList.remove('status-not-started', 'status-in-progress', 'status-completed');
+                barElement.classList.remove('bg-gray-400', 'bg-blue-600', 'bg-green-600');
+
+                // 進捗に応じてクラスを付与
+                if (progress === 100) {
+                    roadmapElement.classList.add('status-completed');
+                    barElement.classList.add('bg-green-600');
+                } else if (progress > 0) {
+                    roadmapElement.classList.add('status-in-progress');
+                    barElement.classList.add('bg-blue-600');
+                } else {
+                    roadmapElement.classList.add('status-not-started');
+                    barElement.classList.add('bg-gray-400');
+                }
+            }
+
+            // タスクのHTML要素を生成する関数
+            function createTaskElement(task, index) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const dueDate = new Date(task.dueDate);
+                const isOverdue = dueDate < today && !task.completed;
+
+                // 優先度データがない場合にデフォルト値を設定
+                if (!task.comments) task.comments = [];
+                if (!task.history) task.history = [];
+                task.priority = task.priority || '中';
+                const priorities = { '高': 'high', '中': 'medium', '低': 'low' };
+                const priorityClass = `priority-${priorities[task.priority]}`;
+
+                const assigneeOptions = teamMembers.map(member => 
+                    `<option value="${member}" ${task.assignee === member ? 'selected' : ''}>${member}</option>`
+                ).join('');
+
+                const priorityOptions = Object.keys(priorities).map(p => 
+                    `<option value="${p}" ${task.priority === p ? 'selected' : ''}>${p}</option>`
+                ).join('');
+
+                const taskRow = document.createElement('div');
+                taskRow.className = `task-row flex items-center justify-between py-1 border-b border-gray-100 cursor-move ${priorityClass}`;
+                taskRow.innerHTML = `
+                    <div class="flex items-center text-gray-700 flex-grow min-w-0">
+                        <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 shrink-0 cursor-pointer" data-task-index="${index}" ${task.completed ? 'checked' : ''}>
+                        <span class="task-text ml-3 truncate cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" title="クリックで全文表示 (ダブルクリックで編集)" data-task-index="${index}">${task.text}</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm shrink-0 ml-4">
+                        <select class="priority-select bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" data-task-index="${index}" title="優先度">${priorityOptions}</select>
+                        <select class="assignee-select bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" data-task-index="${index}">${assigneeOptions}</select>
+                        <input type="date" class="due-date-picker bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer ${isOverdue ? 'text-red-500 font-semibold' : ''}" value="${task.dueDate}" data-task-index="${index}">
+                        <button class="delete-task-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full" data-task-index="${index}" title="タスクを削除">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button class="comment-btn p-1 rounded-full transition-colors ${task.comments.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="コメントを表示/追加">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.821 8.821 0 01-4.083-.98L2 17l1.08-3.242A7.953 7.953 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.417 11.182a6.014 6.014 0 001.583 2.504l.14.144L4.833 16l.733-1.174.16-.09a6.003 6.003 0 002.857.748 6.003 6.003 0 005.417-7.182A6 6 0 004.417 11.182z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button class="history-btn p-1 rounded-full transition-colors ${task.history.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="変更履歴を表示">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 11.586V6z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>`;
+                return taskRow;
+            }
+
+            // 初期表示を生成する関数
+            function initializeViews() {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // 時刻をリセットして日付のみで比較
+
+                roadmapData.forEach(item => {
+                    const roadmapElement = document.querySelector(`[data-roadmap-id="${item.id}"]`);
+                    const taskContainer = roadmapElement.querySelector('[data-task-container]');
+                    const mainAssigneeSelect = roadmapElement.querySelector('[data-main-assignee-select]');
+
+                    // --- ロードマップ全体の担当者選択 ---
+                    if (mainAssigneeSelect) {
+                        // データにプロパティがない場合のデフォルト値
+                        item.mainAssignee = item.mainAssignee || '未定';
+
+                        // 選択肢を生成
+                        const assigneeOptions = teamMembers.map(member => 
+                            `<option value="${member}" ${item.mainAssignee === member ? 'selected' : ''}>${member}</option>`
+                        ).join('');
+                        mainAssigneeSelect.innerHTML = assigneeOptions;
+
+                        // 変更イベントをリッスン
+                        mainAssigneeSelect.addEventListener('change', (e) => {
+                            item.mainAssignee = e.target.value;
+                            saveDataToLocalStorage();
+                        });
+                    }
+                    
+                    // タスクリストを再描画する関数
+                    const rerenderTasks = () => {
+                        taskContainer.innerHTML = ''; // コンテナをクリア
+                        item.tasks.forEach((task, index) => {
+                            const taskElement = createTaskElement(task, index);
+                            taskContainer.appendChild(taskElement);
+                        });
+                    };
+
+                    rerenderTasks(); // タスクリストの初期描画
+
+                    // --- タスクの変更イベントリスナー ---
+                    taskContainer.addEventListener('change', (e) => {
+                        const target = e.target;
+                        const taskIndex = parseInt(target.dataset.taskIndex, 10);
+                        if (isNaN(taskIndex)) return;
+
+                        const task = item.tasks[taskIndex];
+                        if (!task) return;
+
+                        if (target.type === 'checkbox') {
+                            addHistory(task, '完了状態', task.completed, target.checked);
+                            task.completed = target.checked;
+
+                            // スタイルの更新
+                            const taskRow = target.closest('.task-row');
+                            const taskTextSpan = taskRow.querySelector('.task-text');
+                            taskTextSpan.classList.toggle('line-through', task.completed);
+                            taskTextSpan.classList.toggle('text-gray-500', task.completed);
+
+                            // 期限切れスタイルの更新
+                            const datePicker = taskRow.querySelector('.due-date-picker');
+                            const newDueDate = new Date(task.dueDate);
+                            const newIsOverdue = newDueDate < today && !task.completed;
+                            datePicker.classList.toggle('text-red-500', newIsOverdue);
+                            datePicker.classList.toggle('font-semibold', newIsOverdue);
+
+                            // 全体の進捗バーを更新
+                            updateRoadmapView(item.id);
+                            saveDataToLocalStorage();
+                        } else if (target.tagName === 'SELECT' && target.classList.contains('assignee-select')) {
+                            addHistory(task, '担当者', task.assignee, target.value);
+                            task.assignee = target.value;
+                            saveDataToLocalStorage();
+                        } else if (target.type === 'date' && target.classList.contains('due-date-picker')) {
+                            addHistory(task, '期限日', task.dueDate, target.value);
+                            task.dueDate = target.value;
+                            const newDueDate = new Date(task.dueDate);
+                            const newIsOverdue = newDueDate < today && !task.completed;
+                            target.classList.toggle('text-red-500', newIsOverdue);
+                            target.classList.toggle('font-semibold', newIsOverdue);
+                            saveDataToLocalStorage();
+                        } else if (target.tagName === 'SELECT' && target.classList.contains('priority-select')) {
+                            const newPriority = target.value;
+                            addHistory(task, '優先度', task.priority, newPriority);
+                            task.priority = newPriority;
+                            
+                            const priorities = { '高': 'high', '中': 'medium', '低': 'low' };
+                            const taskRow = target.closest('.task-row');
+                            taskRow.classList.remove('priority-high', 'priority-medium', 'priority-low');
+                            taskRow.classList.add(`priority-${priorities[newPriority]}`);
+                            saveDataToLocalStorage();
+                        }
+                    });
+                    
+                    // --- タスクの削除イベントリスナー ---
+                    taskContainer.addEventListener('click', (e) => {
+                        const button = e.target.closest('button');
+                        if (!button) return;
+
+                        const taskIndex = parseInt(button.dataset.taskIndex, 10);
+
+                        // 削除ボタンの処理
+                        if (button.classList.contains('delete-task-btn')) {
+                        if (isNaN(taskIndex) || !item.tasks[taskIndex]) return;
+
+                        // 削除確認ダイアログ
+                        if (confirm(`タスク「${item.tasks[taskIndex].text}」を削除しますか？`)) {
+                            // データ配列からタスクを削除
+                            item.tasks.splice(taskIndex, 1);
+                            
+                            // UIを再描画してリストから削除
+                            rerenderTasks();
+
+                            // ロードマップ全体の進捗を更新
+                            updateRoadmapView(item.id);
+                            saveDataToLocalStorage();
+                        }
+                        }
+                        // コメントボタンの処理
+                        if (button.classList.contains('comment-btn')) {
+                            if (isNaN(taskIndex) || !item.tasks[taskIndex]) return;
+                            openCommentModal(item.id, taskIndex);
+                        }
+                        // 履歴ボタンの処理
+                        if (button.classList.contains('history-btn')) {
+                            if (isNaN(taskIndex) || !item.tasks[taskIndex]) return;
+                            openHistoryModal(item.id, taskIndex);
+                        }
+                    });
+
+                    // --- タスクテキストの全文表示 (クリック) ---
+                    taskContainer.addEventListener('click', (e) => {
+                        const span = e.target.closest('.task-text');
+                        // 編集モードでなく、クリックされたのが省略状態のtask-textの場合
+                        if (span && !span.isContentEditable && span.classList.contains('truncate')) {
+                            span.classList.remove('truncate');
+                        }
+                    });
+
+                    // --- タスクテキストの編集イベントリスナー ---
+                    taskContainer.addEventListener('dblclick', (e) => {
+                        const span = e.target.closest('.task-text');
+                        if (!span || span.isContentEditable) return;
+
+                        span.dataset.originalText = span.textContent;
+                        span.setAttribute('contenteditable', 'true');
+                        span.focus();
+                        document.execCommand('selectAll', false, null);
+                    });
+
+                    taskContainer.addEventListener('keydown', (e) => {
+                        const span = e.target;
+                        if (!span.isContentEditable || !span.classList.contains('task-text')) return;
+
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            span.blur(); // focusoutイベントを発火させて保存
+                        } else if (e.key === 'Escape') {
+                            span.textContent = span.dataset.originalText;
+                            span.blur(); // focusoutイベントを発火させて編集終了
+                        }
+                    });
+
+                    taskContainer.addEventListener('focusout', (e) => {
+                        const span = e.target;
+                        if (!span.classList.contains('task-text') || !span.hasAttribute('contenteditable')) return;
+
+                        span.removeAttribute('contenteditable');
+                        const taskIndex = parseInt(span.dataset.taskIndex, 10);
+                        const task = item.tasks[taskIndex];
+                        const newText = span.textContent.trim();
+
+                        if (newText && newText !== task.text) {
+                            addHistory(task, 'タスク名', task.text, newText);
+                            task.text = newText;
+                            span.textContent = newText; // UIにもトリムした値を反映
+                            saveDataToLocalStorage();
+                        } else {
+                            span.textContent = task.text; // 空になったり変更がなかった場合は元に戻す
+                        }
+                    });
+
+                    // --- タスク追加UIのセットアップ ---
+                    const addTaskUI = roadmapElement.querySelector('[data-add-task-ui]');
+                    const addTaskBtn = addTaskUI.querySelector('.add-task-btn');
+                    const addTaskForm = addTaskUI.querySelector('.add-task-form');
+                    const saveTaskBtn = addTaskForm.querySelector('.save-task-btn');
+                    const cancelAddTaskBtn = addTaskForm.querySelector('.cancel-add-task-btn');
+                    const taskNameInput = addTaskForm.querySelector('input[type="text"]');
+                    const dueDateInput = addTaskForm.querySelector('input[type="date"]');
+
+                    addTaskBtn.addEventListener('click', () => {
+                        addTaskForm.classList.remove('hidden');
+                        addTaskBtn.classList.add('hidden');
+                        taskNameInput.focus();
+                    });
+
+                    cancelAddTaskBtn.addEventListener('click', () => {
+                        addTaskForm.classList.add('hidden');
+                        addTaskBtn.classList.remove('hidden');
+                        taskNameInput.value = '';
+                        dueDateInput.value = '';
+                    });
+
+                    saveTaskBtn.addEventListener('click', () => {
+                        const taskText = taskNameInput.value.trim();
+                        const dueDate = dueDateInput.value;
+
+                        if (!taskText || !dueDate) {
+                            alert('タスク名と期限の両方を入力してください。');
+                            return;
+                        }
+
+                        const newTask = { text: taskText, completed: false, assignee: '未定', dueDate: dueDate, priority: '中', comments: [], history: [] };
+                        addHistory(newTask, '作成', '', taskText);
+                        item.tasks.push(newTask);
+                        // 追加したタスクをリストの最後に描画
+                        const taskElement = createTaskElement(newTask, item.tasks.length - 1);
+                        taskContainer.appendChild(taskElement);
+                        updateRoadmapView(item.id);
+                        saveDataToLocalStorage();
+                        cancelAddTaskBtn.click(); // フォームをリセットして閉じる
+                    });
+
+                    // --- SortableJSのセットアップ ---
+                    new Sortable(taskContainer, {
+                        animation: 150,
+                        ghostClass: 'ghost',   // ドロップ先のプレースホルダー
+                        dragClass: 'dragging', // ドラッグ中の要素
+                        onEnd: function (evt) {
+                            // データ配列の並び替え
+                            const movedTask = item.tasks.splice(evt.oldIndex, 1)[0];
+                            item.tasks.splice(evt.newIndex, 0, movedTask);
+
+                            // DOMのインデックスを更新するために再描画
+                            rerenderTasks();
+                            saveDataToLocalStorage();
+                        }
+                    });
+
+                    // --- 初期の進捗表示 ---
+                    updateRoadmapView(item.id);
+                });
+            }
+
+            // --- コメントモーダルのロジック ---
+            const commentModal = document.getElementById('comment-modal');
+            const commentModalTaskTitle = document.getElementById('comment-modal-task-title');
+            const commentList = document.getElementById('comment-list');
+            const commentTextarea = document.getElementById('comment-textarea');
+            const addCommentBtn = document.getElementById('add-comment-btn');
+            const commentModalCloseBtn = document.getElementById('comment-modal-close-btn');
+
+            function openCommentModal(roadmapId, taskIndex) {
+                const task = roadmapData.find(item => item.id === roadmapId).tasks[taskIndex];
+                commentModal.dataset.roadmapId = roadmapId;
+                commentModal.dataset.taskIndex = taskIndex;
+                commentModalTaskTitle.textContent = task.text;
+                renderComments(task.comments);
+                commentModal.classList.remove('hidden');
+            }
+
+            function closeCommentModal() {
+                commentModal.classList.add('hidden');
+                commentTextarea.value = '';
+            }
+
+            function renderComments(comments) {
+                commentList.innerHTML = '';
+                if (comments.length === 0) {
+                    commentList.innerHTML = `<p class="text-gray-500 text-sm">まだコメントはありません。</p>`;
+                    return;
+                }
+                comments.forEach(comment => {
+                    const commentEl = document.createElement('div');
+                    commentEl.className = 'bg-gray-100 p-3 rounded-md text-sm text-gray-800';
+                    commentEl.textContent = comment;
+                    commentList.appendChild(commentEl);
+                });
+            }
+
+            addCommentBtn.addEventListener('click', () => {
+                const roadmapId = commentModal.dataset.roadmapId;
+                const taskIndex = parseInt(commentModal.dataset.taskIndex, 10);
+                const commentText = commentTextarea.value.trim();
+
+                if (commentText) {
+                    const task = roadmapData.find(item => item.id === roadmapId).tasks[taskIndex];
+                    task.comments.push(commentText);
+                    saveDataToLocalStorage();
+                    renderComments(task.comments);
+                    commentTextarea.value = '';
+
+                    // アイコンのスタイルを更新
+                    const taskRow = document.querySelector(`[data-roadmap-id="${roadmapId}"] [data-task-container] .task-row:nth-child(${taskIndex + 1})`);
+                    if (taskRow) {
+                        const commentBtn = taskRow.querySelector('.comment-btn');
+                        commentBtn.classList.remove('text-gray-400', 'hover:text-blue-500');
+                        commentBtn.classList.add('text-blue-500', 'hover:text-blue-700');
+                    }
+                }
+            });
+
+            commentModalCloseBtn.addEventListener('click', closeCommentModal);
+            commentModal.addEventListener('click', (e) => {
+                if (e.target === commentModal) {
+                    closeCommentModal();
+                }
+            });
+
+            // --- 履歴モーダルのロジック ---
+            const historyModal = document.getElementById('history-modal');
+            const historyModalTaskTitle = document.getElementById('history-modal-task-title');
+            const historyList = document.getElementById('history-list');
+            const historyModalCloseBtn = document.getElementById('history-modal-close-btn');
+
+            function openHistoryModal(roadmapId, taskIndex) {
+                const task = roadmapData.find(item => item.id === roadmapId).tasks[taskIndex];
+                historyModalTaskTitle.textContent = task.text;
+                renderHistory(task.history);
+                historyModal.classList.remove('hidden');
+            }
+
+            function closeHistoryModal() {
+                historyModal.classList.add('hidden');
+            }
+
+            function renderHistory(history) {
+                historyList.innerHTML = '';
+                if (!history || history.length === 0) {
+                    historyList.innerHTML = `<p class="text-gray-500 text-sm">変更履歴はありません。</p>`;
+                    return;
+                }
+                history.forEach(entry => {
+                    const date = new Date(entry.timestamp).toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                    let text = '';
+                    
+                    let from = entry.from;
+                    let to = entry.to;
+
+                    if (entry.action === '完了状態') {
+                        from = from ? '完了' : '未完了';
+                        to = to ? '完了' : '未完了';
+                    }
+
+                    if (entry.action === '作成') {
+                        text = `<div class="font-semibold text-gray-800">${date}</div><div class="ml-4">タスクが作成されました。</div>`;
+                    } else {
+                        text = `<div class="font-semibold text-gray-800">${date}</div><div class="ml-4">「${entry.action}」が <span class="font-medium bg-red-100 text-red-800 px-1 rounded">${from}</span> から <span class="font-medium bg-green-100 text-green-800 px-1 rounded">${to}</span> に変更されました。</div>`;
+                    }
+                    const historyEl = document.createElement('div');
+                    historyEl.className = 'text-sm text-gray-600 border-b border-gray-200 pb-2 mb-2 last:border-b-0 last:mb-0';
+                    historyEl.innerHTML = text;
+                    historyList.appendChild(historyEl);
+                });
+            }
+
+            historyModalCloseBtn.addEventListener('click', closeHistoryModal);
+            historyModal.addEventListener('click', (e) => {
+                if (e.target === historyModal) {
+                    closeHistoryModal();
+                }
+            });
+
+            // --- CSVエクスポートのロジック ---
+            const exportCsvBtn = document.getElementById('export-csv-btn');
+            exportCsvBtn.addEventListener('click', () => {
+                const roadmapTitles = {
+                    'short-1': '短期ロードマップ 1（2025年8月〜2025年10月）',
+                    'short-2': '短期ロードマップ 2（2025年11月〜2026年4月）',
+                    'medium-1': '中期ロードマップ（2026年5月〜2027年4月）',
+                    'long-1': '長期ロードマップ（2027年5月〜）'
+                };
+
+                const headers = ['ロードマップ名', 'タスク名', '完了状態', '担当者', '期限日', '優先度', 'コメント'];
+
+                const escapeCsvCell = (cell) => {
+                    let str = String(cell == null ? '' : cell);
+                    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                        return '"' + str.replace(/"/g, '""') + '"';
+                    }
+                    return str;
+                };
+
+                const csvRows = [headers.join(',')];
+
+                roadmapData.forEach(roadmapItem => {
+                    const roadmapName = roadmapTitles[roadmapItem.id] || roadmapItem.id;
+                    roadmapItem.tasks.forEach(task => {
+                        const row = [
+                            roadmapName,
+                            task.text,
+                            task.completed ? '完了' : '未完了',
+                            task.assignee,
+                            task.dueDate,
+                            task.priority,
+                            task.comments.join('\n') // コメントは改行で結合
+                        ].map(escapeCsvCell);
+                        csvRows.push(row.join(','));
+                    });
+                });
+
+                const csvContent = csvRows.join('\n');
+                const bom = new Uint8Array([0xEF, 0xBB, 0xBF]); // UTF-8 BOM
+                const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `roadmap_export_${new Date().toISOString().slice(0,10)}.csv`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            initializeViews();
+
+            // スクロールに応じたアニメーション
+            const animatedElements = document.querySelectorAll('.fade-in-up');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.1 // 10%表示されたら発火
+            });
+
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+
+    <!-- コメントモーダル -->
+    <div id="comment-modal" class="fixed inset-0 bg-gray-800 bg-opacity-60 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:max-w-lg mx-auto">
+            <div class="p-5 border-b border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-800 truncate">コメント: <span id="comment-modal-task-title"></span></h3>
+            </div>
+            <div id="comment-list" class="p-5 max-h-60 overflow-y-auto space-y-3">
+                <!-- コメントはここに挿入されます -->
+            </div>
+            <div class="p-5 border-t border-gray-200 bg-gray-50">
+                <h4 class="font-semibold text-gray-700 mb-2">コメントを追加</h4>
+                <textarea id="comment-textarea" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="コメントを入力..."></textarea>
+                <div class="flex justify-end mt-3">
+                    <button id="comment-modal-close-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2 hover:bg-gray-300 transition-colors">閉じる</button>
+                    <button id="add-comment-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">追加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 履歴モーダル -->
+    <div id="history-modal" class="fixed inset-0 bg-gray-800 bg-opacity-60 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-11/12 md:max-w-2xl mx-auto">
+            <div class="p-5 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-gray-800 truncate">変更履歴: <span id="history-modal-task-title"></span></h3>
+                <button id="history-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="history-list" class="p-5 max-h-96 overflow-y-auto space-y-3">
+                <!-- 履歴はここに挿入されます -->
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
