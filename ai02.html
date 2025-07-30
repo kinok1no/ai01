@@ -173,6 +173,25 @@
             cursor: text;
             border-radius: 3px;
         }
+
+        /* サブタスク用のスタイル */
+        .subtask-container {
+            padding-left: 2.5rem; /* pl-10 */
+            margin-left: 1.25rem; /* pl-5相当 */
+            margin-top: 4px;
+            margin-bottom: 8px;
+            border-left: 2px solid #e5e7eb; /* border-gray-200 */
+        }
+        .subtask-row {
+            display: flex;
+            align-items: center;
+            padding: 2px 0;
+            font-size: 0.875rem; /* text-sm */
+        }
+        .subtask-text[contenteditable="true"] {
+            outline: 1px solid #9ca3af;
+            background-color: #f9fafb;
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -239,7 +258,7 @@
         <!-- ミーティング日程セクション -->
         <section id="meeting-schedule" class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 scroll-mt-24 fade-in-up">
             <h2 class="text-3xl font-extrabold text-center text-slate-800 mb-6">定例ミーティング日程</h2>
-            <div class="max-w-md mx-auto">
+            <div class="max-w-2xl mx-auto">
                 <ul id="meeting-list" class="space-y-4">
                     <!-- ミーティング日程はここに動的に挿入されます -->
                 </ul>
@@ -692,6 +711,7 @@
             function loadDataFromLocalStorage() {
                 const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
                 const defaultMeetings = [
+                    { date: '2025-07-24', time: '15:30 - 16:00', minutesUrl: 'https://docs.google.com/document/d/1Vp_h1yw9uPZ0Riw-6SeiMC9lLE-03tuWtbPoL0583Iw/edit?tab=t.utsswik9ccuu' },                    
                     { date: '2025-08-06', time: '17:30 - 18:00', minutesUrl: '#' },
                     { date: '2025-08-21', time: '11:30 - 12:00', minutesUrl: '#' },
                     { date: '2025-09-04', time: '12:00 - 12:30', minutesUrl: '#' },
@@ -704,37 +724,37 @@
                         id: 'short-1', 
                         mainAssignee: '企画部',
                         tasks: [
-                            { text: '各部署へのヒアリング実施', completed: true, assignee: '田中', dueDate: '2025-08-15', priority: '高', comments: ['完了。議事録は共有済み。'], history: [] },
-                            { text: 'アンケート調査の設計と配布', completed: true, assignee: '鈴木', dueDate: '2025-08-20', priority: '高', comments: [], history: [] },
-                            { text: '課題リストの作成と優先順位付け', completed: false, assignee: '田中', dueDate: '2025-08-31', priority: '中', comments: ['8/25にドラフトをレビュー予定。'], history: [] },
-                            { text: 'チーム内の役割分担の明確化', completed: true, assignee: '全員', dueDate: '2025-08-10', priority: '中', comments: [], history: [] },
-                            { text: '社内ポータルサイトの開設', completed: false, assignee: '佐藤', dueDate: '2025-09-15', priority: '低', comments: [], history: [] },
+                            { text: '各部署へのヒアリング実施', completed: false, assignee: '田中', dueDate: '2025-08-15', priority: '高', comments: [], history: [], subtasks: [{text: 'ヒアリング対象者のリストアップ', completed: false}, {text: '日程調整', completed: false}] },
+                            { text: 'アンケート調査の設計と配布', completed: false, assignee: '鈴木', dueDate: '2025-08-20', priority: '高', comments: [], history: [], subtasks: [] },
+                            { text: '課題リストの作成と優先順位付け', completed: false, assignee: '田中', dueDate: '2025-08-31', priority: '中', comments: [], history: [], subtasks: [] },
+                            { text: 'チーム内の役割分担の明確化', completed: false, assignee: '全員', dueDate: '2025-08-10', priority: '中', comments: [], history: [], subtasks: [] },
+                            { text: '社内ポータルサイトの開設', completed: false, assignee: '佐藤', dueDate: '2025-09-15', priority: '低', comments: [], history: [], subtasks: [] },
                         ]
                     },
                     { 
                         id: 'short-2', 
                         mainAssignee: 'IT推進部',
                         tasks: [
-                            { text: 'パイロットプロジェクトのテーマ選定', completed: false, assignee: '未定', dueDate: '2025-11-30', priority: '高', comments: [], history: [] },
-                            { text: 'PoC（概念実証）の計画策定', completed: false, assignee: 'IT推進部', dueDate: '2025-12-15', priority: '中', comments: [], history: [] },
-                            { text: '社内セミナーの企画と告知', completed: false, assignee: '未定', dueDate: '2026-01-20', priority: '中', comments: [], history: [] },
+                            { text: 'パイロットプロジェクトのテーマ選定', completed: false, assignee: '未定', dueDate: '2025-11-30', priority: '高', comments: [], history: [], subtasks: [] },
+                            { text: 'PoC（概念実証）の計画策定', completed: false, assignee: 'IT推進部', dueDate: '2025-12-15', priority: '中', comments: [], history: [], subtasks: [] },
+                            { text: '社内セミナーの企画と告知', completed: false, assignee: '未定', dueDate: '2026-01-20', priority: '中', comments: [], history: [], subtasks: [] },
                         ]
                     },
                     { 
                         id: 'medium-1', 
                         mainAssignee: '全社横断チーム',
                         tasks: [
-                            { text: '成功事例の横展開計画', completed: false, assignee: '全社横断チーム', dueDate: '2026-06-30', priority: '高', comments: [], history: [] },
+                            { text: '成功事例の横展開計画', completed: false, assignee: '全社横断チーム', dueDate: '2026-06-30', priority: '高', comments: [], history: [], subtasks: [] },
                             { text: 'データ収集基盤の要件定義', completed: false, assignee: '未定', dueDate: '2026-08-31', priority: '中', comments: [], history: [] },
-                            { text: '高度AI技術の調査開始', completed: false, assignee: '技術調査担当', dueDate: '2026-10-31', priority: '低', comments: [], history: [] },
+                            { text: '高度AI技術の調査開始', completed: false, assignee: '技術調査担当', dueDate: '2026-10-31', priority: '低', comments: [], history: [], subtasks: [] },
                         ]
                     },
                     { 
                         id: 'long-1', 
                         mainAssignee: '経営層',
                         tasks: [
-                            { text: 'AIを活用した新規事業のアイデアソン実施', completed: false, assignee: '未定', dueDate: '2027-06-30', priority: '中', comments: [], history: [] },
-                            { text: 'AI倫理ガイドラインのドラフト作成', completed: false, assignee: '法務部', dueDate: '2027-09-30', priority: '中', comments: [], history: [] },
+                            { text: 'AIを活用した新規事業のアイデアソン実施', completed: false, assignee: '未定', dueDate: '2027-06-30', priority: '中', comments: [], history: [], subtasks: [] },
+                            { text: 'AI倫理ガイドラインのドラフト作成', completed: false, assignee: '法務部', dueDate: '2027-09-30', priority: '中', comments: [], history: [], subtasks: [] },
                         ]
                     },
                 ];
@@ -743,6 +763,12 @@
                     try {
                         const data = JSON.parse(savedData);
                         // 古いデータ形式（ロードマップの配列）からの移行
+                        // 各タスクにsubtasksプロパティを確実に追加
+                        data.roadmaps?.forEach(roadmap => {
+                            roadmap.tasks?.forEach(task => {
+                                if (!task.subtasks) task.subtasks = [];
+                            });
+                        });
                         if (Array.isArray(data)) {
                             return { roadmaps: data, meetings: defaultMeetings };
                         }
@@ -874,6 +900,12 @@
                 const priorities = { '高': 'high', '中': 'medium', '低': 'low' };
                 const priorityClass = `priority-${priorities[task.priority]}`;
 
+                // サブタスク関連の情報を準備
+                if (!task.subtasks) task.subtasks = [];
+                const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+                const completedSubtasks = hasSubtasks ? task.subtasks.filter(st => st.completed).length : 0;
+                const toggleButtonTitle = hasSubtasks ? 'サブタスクの表示/非表示' : 'サブタスクを追加';
+
                 const assigneeOptions = teamMembers.map(member => 
                     `<option value="${member}" ${task.assignee === member ? 'selected' : ''}>${member}</option>`
                 ).join('');
@@ -882,36 +914,38 @@
                     `<option value="${p}" ${task.priority === p ? 'selected' : ''}>${p}</option>`
                 ).join('');
 
-                const taskRow = document.createElement('div');
-                taskRow.className = `task-row flex items-center justify-between py-1 border-b border-gray-100 cursor-move ${priorityClass}`;
-                taskRow.dataset.roadmapId = roadmapId;
-                taskRow.dataset.taskIndex = index;
-                taskRow.innerHTML = `
-                    <div class="flex items-center text-gray-700 flex-grow min-w-0">
-                        <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 shrink-0 cursor-pointer" data-task-index="${index}" ${task.completed ? 'checked' : ''}>
-                        <span class="task-text ml-3 truncate cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" title="クリックで全文表示 (ダブルクリックで編集)" data-task-index="${index}">${task.text}</span>
+                const taskWrapper = document.createElement('div');
+                taskWrapper.className = 'task-wrapper';
+                taskWrapper.innerHTML = `
+                    <div class="task-row flex items-center justify-between py-1 border-b border-gray-100 cursor-move ${priorityClass}" data-roadmap-id="${roadmapId}" data-task-index="${index}">
+                        <div class="flex items-center text-gray-700 flex-grow min-w-0">
+                            <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 shrink-0 cursor-pointer" data-task-index="${index}" ${task.completed ? 'checked' : ''}>
+                            <button class="subtask-toggle-btn p-1 rounded-full hover:bg-gray-200 transition-colors ml-1" data-task-index="${index}" title="${toggleButtonTitle}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <span class="task-text ml-1 truncate cursor-pointer ${task.completed ? 'line-through text-gray-500' : ''}" title="クリックで全文表示 (ダブルクリックで編集)" data-task-index="${index}">${task.text}</span>
+                            <span class="ml-2 text-xs bg-gray-200 text-gray-600 rounded-full px-2 py-0.5 shrink-0 ${!hasSubtasks ? 'hidden' : ''}" title="完了サブタスク/全サブタスク">${completedSubtasks}/${task.subtasks.length}</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-sm shrink-0 ml-4">
+                            <select class="priority-select bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" data-task-index="${index}" title="優先度">${priorityOptions}</select>
+                            <select class="assignee-select bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" data-task-index="${index}">${assigneeOptions}</select>
+                            <input type="date" class="due-date-picker bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer ${isOverdue ? 'text-red-500 font-semibold' : ''}" value="${task.dueDate}" data-task-index="${index}">
+                            <button class="delete-task-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full" data-task-index="${index}" title="タスクを削除">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button class="comment-btn p-1 rounded-full transition-colors ${task.comments.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="コメントを表示/追加">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.821 8.821 0 01-4.083-.98L2 17l1.08-3.242A7.953 7.953 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.417 11.182a6.014 6.014 0 001.583 2.504l.14.144L4.833 16l.733-1.174.16-.09a6.003 6.003 0 002.857.748 6.003 6.003 0 005.417-7.182A6 6 0 004.417 11.182z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button class="history-btn p-1 rounded-full transition-colors ${task.history.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="変更履歴を表示">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 11.586V6z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-2 text-sm shrink-0 ml-4">
-                        <select class="priority-select bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" data-task-index="${index}" title="優先度">${priorityOptions}</select>
-                        <select class="assignee-select bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer" data-task-index="${index}">${assigneeOptions}</select>
-                        <input type="date" class="due-date-picker bg-gray-100 border-gray-300 text-gray-700 text-xs rounded-full p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer ${isOverdue ? 'text-red-500 font-semibold' : ''}" value="${task.dueDate}" data-task-index="${index}">
-                        <button class="delete-task-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full" data-task-index="${index}" title="タスクを削除">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <button class="comment-btn p-1 rounded-full transition-colors ${task.comments.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="コメントを表示/追加">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.821 8.821 0 01-4.083-.98L2 17l1.08-3.242A7.953 7.953 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.417 11.182a6.014 6.014 0 001.583 2.504l.14.144L4.833 16l.733-1.174.16-.09a6.003 6.003 0 002.857.748 6.003 6.003 0 005.417-7.182A6 6 0 004.417 11.182z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                        <button class="history-btn p-1 rounded-full transition-colors ${task.history.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="変更履歴を表示">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 11.586V6z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>`;
-                return taskRow;
+                    <div class="subtask-container hidden" data-roadmap-id="${roadmapId}" data-task-index="${index}">
+                        <!-- サブタスクはここに動的に挿入されます -->
+                    </div>
+                `;
+                return taskWrapper;
             }
 
             // --- フィルター関連のロジック ---
@@ -956,7 +990,8 @@
                 const endOfWeek = new Date(today);
                 endOfWeek.setDate(today.getDate() + (7 - today.getDay()) % 7);
 
-                document.querySelectorAll('.task-row').forEach(taskRow => {
+                document.querySelectorAll('.task-wrapper').forEach(taskWrapper => {
+                    const taskRow = taskWrapper.querySelector('.task-row');
                     const roadmapId = taskRow.dataset.roadmapId;
                     const taskIndex = parseInt(taskRow.dataset.taskIndex, 10);
                     const task = projectData.roadmaps.find(item => item.id === roadmapId)?.tasks[taskIndex];
@@ -977,7 +1012,7 @@
                         (dueDateFilter === 'today' && taskDueDate.getTime() === today.getTime()) ||
                         (dueDateFilter === 'this_week' && taskDueDate >= today && taskDueDate <= endOfWeek);
 
-                    taskRow.classList.toggle('hidden', !(keywordMatch && assigneeMatch && statusMatch && dueDateMatch && priorityMatch));
+                    taskWrapper.classList.toggle('hidden', !(keywordMatch && assigneeMatch && statusMatch && dueDateMatch && priorityMatch));
                 });
             }
 
@@ -1026,8 +1061,8 @@
                     const renderTasks = () => {
                         taskContainer.innerHTML = ''; // コンテナをクリア
                         item.tasks.forEach((task, index) => {
-                            const taskElement = createTaskElement(task, index, item.id);
-                            taskContainer.appendChild(taskElement);
+                            const taskWrapper = createTaskElement(task, index, item.id);
+                            taskContainer.appendChild(taskWrapper);
                         });
                         applyFilters(); // 描画後にフィルターを適用
                     };
@@ -1035,7 +1070,7 @@
                     renderTasks(); // タスクリストの初期描画
 
                     // --- タスクの変更イベントリスナー ---
-                    taskContainer.addEventListener('change', (e) => {
+                    roadmapElement.addEventListener('change', (e) => {
                         const target = e.target;
                         const taskIndex = parseInt(target.dataset.taskIndex, 10);
                         if (isNaN(taskIndex)) return;
@@ -1070,11 +1105,22 @@
                             const priorities = { '高': 'high', '中': 'medium', '低': 'low' };
                             renderTasks(); // 優先度インジケータの色を更新するために再描画
                             saveDataToLocalStorage();
+                        } else if (target.classList.contains('subtask-checkbox')) {
+                            const subtaskIndex = parseInt(target.dataset.subtaskIndex, 10);
+                            const subtask = task.subtasks[subtaskIndex];
+                            subtask.completed = target.checked;
+                            saveDataToLocalStorage();
+                            // UI更新
+                            const subtaskText = target.nextElementSibling;
+                            subtaskText.classList.toggle('line-through', subtask.completed);
+                            subtaskText.classList.toggle('text-gray-500', subtask.completed);
+                            // 親タスクのバッジを更新
+                            renderTasks();
                         }
                     });
                     
                     // --- タスクの削除イベントリスナー ---
-                    taskContainer.addEventListener('click', (e) => {
+                    roadmapElement.addEventListener('click', (e) => {
                         const button = e.target.closest('button');
                         if (!button) return;
 
@@ -1108,10 +1154,34 @@
                             if (isNaN(taskIndex) || !item.tasks[taskIndex]) return;
                             openHistoryModal(item.id, taskIndex);
                         }
+                        // サブタスクの表示切り替え
+                        if (button.classList.contains('subtask-toggle-btn')) {
+                            const subtaskContainer = button.closest('.task-wrapper').querySelector('.subtask-container');
+                            const icon = button.querySelector('svg');
+                            subtaskContainer.classList.toggle('hidden');
+                            icon.classList.toggle('rotate-[-90deg]');
+                            if (!subtaskContainer.classList.contains('hidden') && subtaskContainer.childElementCount === 0) {
+                                renderSubtasks(subtaskContainer, item.id, taskIndex);
+                            }
+                        }
+                        // サブタスクの削除
+                        if (button.classList.contains('delete-subtask-btn')) {
+                            const parentTaskIndex = parseInt(button.dataset.parentTaskIndex, 10);
+                            const subtaskIndex = parseInt(button.dataset.subtaskIndex, 10);
+                            const task = item.tasks[parentTaskIndex];
+                            if (confirm(`サブタスク「${task.subtasks[subtaskIndex].text}」を削除しますか？`)) {
+                                task.subtasks.splice(subtaskIndex, 1);
+                                saveDataToLocalStorage();
+                                const subtaskContainer = button.closest('.subtask-container');
+                                renderSubtasks(subtaskContainer, item.id, parentTaskIndex);
+                                // 親タスクのUIを更新するために再描画
+                                renderTasks();
+                            }
+                        }
                     });
 
                     // --- タスクテキストの全文表示 (クリック) ---
-                    taskContainer.addEventListener('click', (e) => {
+                    roadmapElement.addEventListener('click', (e) => {
                         const span = e.target.closest('.task-text');
                         // 編集モードでなく、クリックされたのが省略状態のtask-textの場合
                         if (span && !span.isContentEditable && span.classList.contains('truncate')) {
@@ -1120,7 +1190,7 @@
                     });
 
                     // --- タスクテキストの編集イベントリスナー ---
-                    taskContainer.addEventListener('dblclick', (e) => {
+                    roadmapElement.addEventListener('dblclick', (e) => {
                         const span = e.target.closest('.task-text');
                         if (!span || span.isContentEditable) return;
 
@@ -1128,10 +1198,20 @@
                         span.setAttribute('contenteditable', 'true');
                         span.focus();
                         document.execCommand('selectAll', false, null);
+
+                        const subtaskSpan = e.target.closest('.subtask-text');
+                        if (!subtaskSpan || subtaskSpan.isContentEditable) return;
+
+                        subtaskSpan.dataset.originalText = subtaskSpan.textContent;
+                        subtaskSpan.setAttribute('contenteditable', 'true');
+                        subtaskSpan.focus();
+                        document.execCommand('selectAll', false, null);
                     });
 
-                    taskContainer.addEventListener('keydown', (e) => {
+                    roadmapElement.addEventListener('keydown', (e) => {
                         const span = e.target;
+                        if (!span.isContentEditable) return;
+
                         if (!span.isContentEditable || !span.classList.contains('task-text')) return;
 
                         if (e.key === 'Enter') {
@@ -1141,9 +1221,20 @@
                             span.textContent = span.dataset.originalText;
                             span.blur(); // focusoutイベントを発火させて編集終了
                         }
+
+                        const subtaskSpan = e.target;
+                        if (!subtaskSpan.isContentEditable || !subtaskSpan.classList.contains('subtask-text')) return;
+
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            subtaskSpan.blur();
+                        } else if (e.key === 'Escape') {
+                            subtaskSpan.textContent = subtaskSpan.dataset.originalText;
+                            subtaskSpan.blur();
+                        }
                     });
 
-                    taskContainer.addEventListener('focusout', (e) => {
+                    roadmapElement.addEventListener('focusout', (e) => {
                         const span = e.target;
                         if (!span.classList.contains('task-text') || !span.hasAttribute('contenteditable')) return;
 
@@ -1159,6 +1250,22 @@
                             saveDataToLocalStorage();
                         } else {
                             span.textContent = task.text; // 空になったり変更がなかった場合は元に戻す
+                        }
+
+                        const subtaskSpan = e.target;
+                        if (!subtaskSpan.classList.contains('subtask-text') || !subtaskSpan.hasAttribute('contenteditable')) return;
+
+                        subtaskSpan.removeAttribute('contenteditable');
+                        const parentTaskIndex = parseInt(subtaskSpan.dataset.parentTaskIndex, 10);
+                        const subtaskIndex = parseInt(subtaskSpan.dataset.subtaskIndex, 10);
+                        const subtask = item.tasks[parentTaskIndex].subtasks[subtaskIndex];
+                        const newSubtaskText = subtaskSpan.textContent.trim();
+
+                        if (newSubtaskText && newSubtaskText !== subtask.text) {
+                            subtask.text = newSubtaskText;
+                            saveDataToLocalStorage();
+                        } else {
+                            subtaskSpan.textContent = subtask.text;
                         }
                     });
 
@@ -1193,7 +1300,7 @@
                             return;
                         }
 
-                        const newTask = { text: taskText, completed: false, assignee: '未定', dueDate: dueDate, priority: '中', comments: [], history: [] };
+                        const newTask = { text: taskText, completed: false, assignee: '未定', dueDate: dueDate, priority: '中', comments: [], history: [], subtasks: [] };
                         addHistory(newTask, '作成', '', taskText);
                         item.tasks.push(newTask);
                         renderTasks(); // リスト全体を再描画
@@ -1207,7 +1314,8 @@
                     new Sortable(taskContainer, {
                         animation: 150,
                         ghostClass: 'ghost',   // ドロップ先のプレースホルダー
-                        dragClass: 'dragging', // ドラッグ中の要素
+                        dragClass: 'dragging', // ドラッグ中の要素,
+                        handle: '.task-row', // ハンドルをtask-rowに限定
                         onEnd: function (evt) {
                             // データ配列の並び替え
                             const movedTask = item.tasks.splice(evt.oldIndex, 1)[0];
@@ -1227,6 +1335,65 @@
                 updateOverallSummary();
                 initializeMeetings();
                 applyFilters();
+            }
+            
+            function renderSubtasks(container, roadmapId, parentTaskIndex) {
+                container.innerHTML = '';
+                const task = projectData.roadmaps.find(r => r.id === roadmapId).tasks[parentTaskIndex];
+                if (!task.subtasks) task.subtasks = [];
+
+                task.subtasks.forEach((subtask, subtaskIndex) => {
+                    const subtaskEl = document.createElement('div');
+                    subtaskEl.className = 'subtask-row';
+                    subtaskEl.innerHTML = `
+                        <input type="checkbox" class="subtask-checkbox form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 shrink-0 cursor-pointer" data-parent-task-index="${parentTaskIndex}" data-subtask-index="${subtaskIndex}" ${subtask.completed ? 'checked' : ''}>
+                        <span class="subtask-text ml-2 flex-grow cursor-pointer ${subtask.completed ? 'line-through text-gray-500' : ''}" data-parent-task-index="${parentTaskIndex}" data-subtask-index="${subtaskIndex}" title="ダブルクリックで編集">${subtask.text}</span>
+                        <button class="delete-subtask-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full shrink-0" data-parent-task-index="${parentTaskIndex}" data-subtask-index="${subtaskIndex}" title="サブタスクを削除">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                    `;
+                    container.appendChild(subtaskEl);
+                });
+
+                // サブタスク追加フォーム
+                const addSubtaskForm = document.createElement('div');
+                addSubtaskForm.className = 'add-subtask-form hidden mt-2';
+                addSubtaskForm.innerHTML = `
+                    <input type="text" placeholder="新しいサブタスク" class="w-full p-1 border rounded-md text-sm">
+                    <div class="flex justify-end gap-2 mt-1">
+                        <button class="cancel-add-subtask-btn bg-gray-200 text-gray-700 px-2 py-1 rounded-md text-xs">キャンセル</button>
+                        <button class="save-subtask-btn bg-blue-600 text-white px-2 py-1 rounded-md text-xs">保存</button>
+                    </div>
+                `;
+                container.appendChild(addSubtaskForm);
+
+                const addSubtaskBtn = document.createElement('button');
+                addSubtaskBtn.className = 'add-subtask-btn mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center transition-colors';
+                addSubtaskBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>サブタスクを追加`;
+                container.appendChild(addSubtaskBtn);
+
+                // イベントリスナー
+                addSubtaskBtn.addEventListener('click', () => {
+                    addSubtaskForm.classList.remove('hidden');
+                    addSubtaskBtn.classList.add('hidden');
+                    addSubtaskForm.querySelector('input').focus();
+                });
+                addSubtaskForm.querySelector('.cancel-add-subtask-btn').addEventListener('click', () => {
+                    addSubtaskForm.classList.add('hidden');
+                    addSubtaskBtn.classList.remove('hidden');
+                    addSubtaskForm.querySelector('input').value = '';
+                });
+                addSubtaskForm.querySelector('.save-subtask-btn').addEventListener('click', () => {
+                    const input = addSubtaskForm.querySelector('input');
+                    const text = input.value.trim();
+                    if (text) {
+                        task.subtasks.push({ text: text, completed: false });
+                        saveDataToLocalStorage();
+                        renderSubtasks(container, roadmapId, parentTaskIndex);
+                        // 親タスクのUI（バッジなど）を更新するために再描画
+                        document.querySelector(`[data-roadmap-id="${roadmapId}"] [data-task-index="${parentTaskIndex}"]`).closest('.task-wrapper').replaceWith(createTaskElement(task, parentTaskIndex, roadmapId));
+                    }
+                });
             }
 
             // --- コメントモーダルのロジック ---
@@ -1408,6 +1575,7 @@
                     const roadmapElement = document.querySelector(`.timeline-item[data-roadmap-id="${roadmapItem.id}"] h3`);
                     const roadmapName = roadmapElement ? roadmapElement.textContent : roadmapItem.id;
                     roadmapItem.tasks.forEach(task => {
+                        if (!task.subtasks) task.subtasks = [];
                         const row = [
                             roadmapName,
                             task.text,
@@ -1418,6 +1586,17 @@
                             task.comments.join('\n') // コメントは改行で結合
                         ].map(escapeCsvCell);
                         csvRows.push(row.join(','));
+
+                        // サブタスクの行を追加
+                        task.subtasks.forEach(subtask => {
+                            const subtaskRow = [
+                                roadmapName,
+                                `  - ${subtask.text}`, // インデントでサブタスクを表現
+                                subtask.completed ? '完了' : '未完了',
+                                '', '', '', '' // 親タスク以外の情報は空
+                            ].map(escapeCsvCell);
+                            csvRows.push(subtaskRow.join(','));
+                        });
                     });
                 });
 
@@ -1442,6 +1621,9 @@
                 const meetingDateInput = document.getElementById('meeting-date');
                 const meetingTimeInput = document.getElementById('meeting-time');
                 const meetingMinutesUrlInput = document.getElementById('meeting-minutes-url');
+
+                // フォームのタイトル要素を取得
+                const meetingFormTitle = addMeetingForm.querySelector('h4');
 
                 function renderMeetingList() {
                     meetingList.innerHTML = '';
@@ -1472,6 +1654,9 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
                                     議事録
                                 </a>
+                                <button class="edit-meeting-btn text-gray-400 hover:text-blue-500 transition-colors p-1 rounded-full ml-2" data-index="${index}" title="ミーティングを編集">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                                </button>
                                 <button class="delete-meeting-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full ml-2" data-index="${index}" title="ミーティングを削除">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
                                 </button>
@@ -1480,10 +1665,75 @@
                     });
                 }
 
-                addMeetingBtn.addEventListener('click', () => { addMeetingForm.classList.remove('hidden'); addMeetingBtn.classList.add('hidden'); });
-                cancelAddMeetingBtn.addEventListener('click', () => { addMeetingForm.classList.add('hidden'); addMeetingBtn.classList.remove('hidden'); meetingDateInput.value = ''; meetingTimeInput.value = ''; meetingMinutesUrlInput.value = ''; });
-                saveMeetingBtn.addEventListener('click', () => { const date = meetingDateInput.value; const time = meetingTimeInput.value.trim(); const minutesUrl = meetingMinutesUrlInput.value.trim(); if (!date || !time) { alert('日付と時間を入力してください。'); return; } projectData.meetings.push({ date, time, minutesUrl }); saveDataToLocalStorage(); renderMeetingList(); cancelAddMeetingBtn.click(); });
-                meetingList.addEventListener('click', (e) => { const deleteBtn = e.target.closest('.delete-meeting-btn'); if (!deleteBtn) return; const index = parseInt(deleteBtn.dataset.index, 10); if (isNaN(index)) return; const meeting = projectData.meetings[index]; if (confirm(`ミーティング（${meeting.date} ${meeting.time}）を削除しますか？`)) { projectData.meetings.splice(index, 1); saveDataToLocalStorage(); renderMeetingList(); } });
+                function openMeetingForm(index = null) {
+                    addMeetingForm.classList.remove('hidden');
+                    addMeetingBtn.classList.add('hidden');
+
+                    if (index !== null) {
+                        // 編集モード
+                        const meeting = projectData.meetings[index];
+                        meetingFormTitle.textContent = 'ミーティングを編集';
+                        meetingDateInput.value = meeting.date;
+                        meetingTimeInput.value = meeting.time;
+                        meetingMinutesUrlInput.value = meeting.minutesUrl || '';
+                        addMeetingForm.dataset.editingIndex = index;
+                    } else {
+                        // 追加モード
+                        meetingFormTitle.textContent = '新しいミーティングを追加';
+                        meetingDateInput.value = '';
+                        meetingTimeInput.value = '';
+                        meetingMinutesUrlInput.value = '';
+                        delete addMeetingForm.dataset.editingIndex;
+                    }
+                    meetingDateInput.focus();
+                }
+
+                function closeMeetingForm() {
+                    addMeetingForm.classList.add('hidden');
+                    addMeetingBtn.classList.remove('hidden');
+                }
+
+                addMeetingBtn.addEventListener('click', () => openMeetingForm());
+                cancelAddMeetingBtn.addEventListener('click', closeMeetingForm);
+                
+                saveMeetingBtn.addEventListener('click', () => {
+                    const date = meetingDateInput.value;
+                    const time = meetingTimeInput.value.trim();
+                    const minutesUrl = meetingMinutesUrlInput.value.trim();
+                    if (!date || !time) {
+                        alert('日付と時間を入力してください。');
+                        return;
+                    }
+
+                    const editingIndex = addMeetingForm.dataset.editingIndex;
+                    if (editingIndex !== undefined) {
+                        projectData.meetings[editingIndex] = { date, time, minutesUrl };
+                    } else {
+                        projectData.meetings.push({ date, time, minutesUrl });
+                    }
+                    
+                    saveDataToLocalStorage();
+                    renderMeetingList();
+                    closeMeetingForm();
+                });
+
+                meetingList.addEventListener('click', (e) => {
+                    const targetButton = e.target.closest('button');
+                    if (!targetButton) return;
+                    const index = parseInt(targetButton.dataset.index, 10);
+                    if (isNaN(index)) return;
+
+                    if (targetButton.classList.contains('edit-meeting-btn')) {
+                        openMeetingForm(index);
+                    } else if (targetButton.classList.contains('delete-meeting-btn')) {
+                        const meeting = projectData.meetings[index];
+                        if (confirm(`ミーティング（${meeting.date} ${meeting.time}）を削除しますか？`)) {
+                            projectData.meetings.splice(index, 1);
+                            saveDataToLocalStorage();
+                            renderMeetingList();
+                        }
+                    }
+                });
 
                 renderMeetingList();
             }
