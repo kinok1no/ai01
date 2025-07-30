@@ -660,7 +660,12 @@
     <!-- フッターセクション -->
     <footer class="bg-slate-900 text-white p-6 mt-12">
         <div class="container mx-auto text-center text-sm">
-            &copy; <span id="current-year">2025</span> AI活用推進チーム. All rights reserved.
+            <p>&copy; <span id="current-year">2025</span> AI活用推進チーム. All rights reserved.</p>
+            <div class="mt-4">
+                <button id="reset-storage-btn" class="text-xs text-slate-400 hover:text-red-400 border border-slate-600 hover:border-red-500 rounded-full px-3 py-1 transition-colors">
+                    全データをリセット
+                </button>
+            </div>
         </div>
     </footer>
 
@@ -728,7 +733,6 @@
                             { text: 'アンケート調査の設計と配布', completed: false, assignee: '鈴木', dueDate: '2025-08-20', priority: '高', comments: [], subtasks: [] },
                             { text: '課題リストの作成と優先順位付け', completed: false, assignee: '田中', dueDate: '2025-08-31', priority: '中', comments: [], subtasks: [] },
                             { text: 'チーム内の役割分担の明確化', completed: false, assignee: '全員', dueDate: '2025-08-10', priority: '中', comments: [], subtasks: [] },
-                            { text: 'AIツールの選定', completed: false, assignee: '全員', dueDate: '2025-08-10', priority: '中', comments: [], subtasks: [] },                            
                             { text: '社内ポータルサイトの開設', completed: false, assignee: '佐藤', dueDate: '2025-09-15', priority: '低', comments: [], subtasks: [] },
                         ]
                     },
@@ -1674,6 +1678,17 @@
             animatedElements.forEach(el => {
                 observer.observe(el);
             });
+
+            // --- ローカルストレージリセットボタンのロジック ---
+            const resetStorageBtn = document.getElementById('reset-storage-btn');
+            if (resetStorageBtn) {
+                resetStorageBtn.addEventListener('click', () => {
+                    if (confirm('本当にすべてのタスクデータをリセットして、ページを再読み込みしますか？この操作は元に戻せません。')) {
+                        localStorage.removeItem(LOCAL_STORAGE_KEY);
+                        location.reload();
+                    }
+                });
+            }
         });
     </script>
 
