@@ -724,37 +724,37 @@
                         id: 'short-1', 
                         mainAssignee: '企画部',
                         tasks: [
-                            { text: '各部署へのヒアリング実施', completed: false, assignee: '田中', dueDate: '2025-08-15', priority: '高', comments: [], history: [], subtasks: [{text: 'ヒアリング対象者のリストアップ', completed: false}, {text: '日程調整', completed: false}] },
-                            { text: 'アンケート調査の設計と配布', completed: false, assignee: '鈴木', dueDate: '2025-08-20', priority: '高', comments: [], history: [], subtasks: [] },
-                            { text: '課題リストの作成と優先順位付け', completed: false, assignee: '田中', dueDate: '2025-08-31', priority: '中', comments: [], history: [], subtasks: [] },
-                            { text: 'チーム内の役割分担の明確化', completed: false, assignee: '全員', dueDate: '2025-08-10', priority: '中', comments: [], history: [], subtasks: [] },
-                            { text: '社内ポータルサイトの開設', completed: false, assignee: '佐藤', dueDate: '2025-09-15', priority: '低', comments: [], history: [], subtasks: [] },
+                            { text: '各部署へのヒアリング実施', completed: false, assignee: '田中', dueDate: '2025-08-15', priority: '高', comments: [], subtasks: [{text: 'ヒアリング対象者のリストアップ', completed: false}, {text: '日程調整', completed: false}] },
+                            { text: 'アンケート調査の設計と配布', completed: false, assignee: '鈴木', dueDate: '2025-08-20', priority: '高', comments: [], subtasks: [] },
+                            { text: '課題リストの作成と優先順位付け', completed: false, assignee: '田中', dueDate: '2025-08-31', priority: '中', comments: [], subtasks: [] },
+                            { text: 'チーム内の役割分担の明確化', completed: false, assignee: '全員', dueDate: '2025-08-10', priority: '中', comments: [], subtasks: [] },
+                            { text: '社内ポータルサイトの開設', completed: false, assignee: '佐藤', dueDate: '2025-09-15', priority: '低', comments: [], subtasks: [] },
                         ]
                     },
                     { 
                         id: 'short-2', 
                         mainAssignee: 'IT推進部',
                         tasks: [
-                            { text: 'パイロットプロジェクトのテーマ選定', completed: false, assignee: '未定', dueDate: '2025-11-30', priority: '高', comments: [], history: [], subtasks: [] },
-                            { text: 'PoC（概念実証）の計画策定', completed: false, assignee: 'IT推進部', dueDate: '2025-12-15', priority: '中', comments: [], history: [], subtasks: [] },
-                            { text: '社内セミナーの企画と告知', completed: false, assignee: '未定', dueDate: '2026-01-20', priority: '中', comments: [], history: [], subtasks: [] },
+                            { text: 'パイロットプロジェクトのテーマ選定', completed: false, assignee: '未定', dueDate: '2025-11-30', priority: '高', comments: [], subtasks: [] },
+                            { text: 'PoC（概念実証）の計画策定', completed: false, assignee: 'IT推進部', dueDate: '2025-12-15', priority: '中', comments: [], subtasks: [] },
+                            { text: '社内セミナーの企画と告知', completed: false, assignee: '未定', dueDate: '2026-01-20', priority: '中', comments: [], subtasks: [] },
                         ]
                     },
                     { 
                         id: 'medium-1', 
                         mainAssignee: '全社横断チーム',
                         tasks: [
-                            { text: '成功事例の横展開計画', completed: false, assignee: '全社横断チーム', dueDate: '2026-06-30', priority: '高', comments: [], history: [], subtasks: [] },
-                            { text: 'データ収集基盤の要件定義', completed: false, assignee: '未定', dueDate: '2026-08-31', priority: '中', comments: [], history: [] },
-                            { text: '高度AI技術の調査開始', completed: false, assignee: '技術調査担当', dueDate: '2026-10-31', priority: '低', comments: [], history: [], subtasks: [] },
+                            { text: '成功事例の横展開計画', completed: false, assignee: '全社横断チーム', dueDate: '2026-06-30', priority: '高', comments: [], subtasks: [] },
+                            { text: 'データ収集基盤の要件定義', completed: false, assignee: '未定', dueDate: '2026-08-31', priority: '中', comments: [], subtasks: [] },
+                            { text: '高度AI技術の調査開始', completed: false, assignee: '技術調査担当', dueDate: '2026-10-31', priority: '低', comments: [], subtasks: [] },
                         ]
                     },
                     { 
                         id: 'long-1', 
                         mainAssignee: '経営層',
                         tasks: [
-                            { text: 'AIを活用した新規事業のアイデアソン実施', completed: false, assignee: '未定', dueDate: '2027-06-30', priority: '中', comments: [], history: [], subtasks: [] },
-                            { text: 'AI倫理ガイドラインのドラフト作成', completed: false, assignee: '法務部', dueDate: '2027-09-30', priority: '中', comments: [], history: [], subtasks: [] },
+                            { text: 'AIを活用した新規事業のアイデアソン実施', completed: false, assignee: '未定', dueDate: '2027-06-30', priority: '中', comments: [], subtasks: [] },
+                            { text: 'AI倫理ガイドラインのドラフト作成', completed: false, assignee: '法務部', dueDate: '2027-09-30', priority: '中', comments: [], subtasks: [] },
                         ]
                     },
                 ];
@@ -787,20 +787,6 @@
             // --- プロジェクトデータ ---
             let projectData = loadDataFromLocalStorage();
             let roadmapData = projectData.roadmaps; // 既存コードとの互換性のため
-
-            // --- 履歴記録関数 ---
-            function addHistory(task, action, from, to) {
-                if (!task.history) {
-                    task.history = [];
-                }
-                const newHistory = {
-                    timestamp: new Date().toISOString(),
-                    action: action,
-                    from: from,
-                    to: to
-                };
-                task.history.unshift(newHistory); // 最新の履歴を先頭に追加
-            }
 
             // --- 全体サマリーを更新する関数 ---
             function updateOverallSummary() {
@@ -895,7 +881,6 @@
 
                 // 優先度データがない場合にデフォルト値を設定
                 if (!task.comments) task.comments = [];
-                if (!task.history) task.history = [];
                 task.priority = task.priority || '中';
                 const priorities = { '高': 'high', '中': 'medium', '低': 'low' };
                 const priorityClass = `priority-${priorities[task.priority]}`;
@@ -935,9 +920,6 @@
                             </button>
                             <button class="comment-btn p-1 rounded-full transition-colors ${task.comments.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="コメントを表示/追加">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.821 8.821 0 01-4.083-.98L2 17l1.08-3.242A7.953 7.953 0 012 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM4.417 11.182a6.014 6.014 0 001.583 2.504l.14.144L4.833 16l.733-1.174.16-.09a6.003 6.003 0 002.857.748 6.003 6.003 0 005.417-7.182A6 6 0 004.417 11.182z" clip-rule="evenodd" /></svg>
-                            </button>
-                            <button class="history-btn p-1 rounded-full transition-colors ${task.history.length > 0 ? 'text-blue-500 hover:text-blue-700' : 'text-gray-400 hover:text-blue-500'}" data-task-index="${index}" title="変更履歴を表示">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 11.586V6z" clip-rule="evenodd" /></svg>
                             </button>
                         </div>
                     </div>
@@ -1079,7 +1061,6 @@
                         if (!task) return;
 
                         if (target.type === 'checkbox') {
-                            addHistory(task, '完了状態', task.completed, target.checked);
                             task.completed = target.checked;
                             // UI全体を再描画してスタイルを更新
                             renderTasks();
@@ -1088,18 +1069,15 @@
                             updateOverallSummary();
                             saveDataToLocalStorage();
                         } else if (target.tagName === 'SELECT' && target.classList.contains('assignee-select')) {
-                            addHistory(task, '担当者', task.assignee, target.value);
                             task.assignee = target.value;
                             saveDataToLocalStorage();
                         } else if (target.type === 'date' && target.classList.contains('due-date-picker')) {
-                            addHistory(task, '期限日', task.dueDate, target.value);
                             task.dueDate = target.value;
                             renderTasks(); // 期限切れスタイルを更新するために再描画
                             updateOverallSummary();
                             saveDataToLocalStorage();
                         } else if (target.tagName === 'SELECT' && target.classList.contains('priority-select')) {
                             const newPriority = target.value;
-                            addHistory(task, '優先度', task.priority, newPriority);
                             task.priority = newPriority;
                             
                             const priorities = { '高': 'high', '中': 'medium', '低': 'low' };
@@ -1148,11 +1126,6 @@
                         if (button.classList.contains('comment-btn')) {
                             if (isNaN(taskIndex) || !item.tasks[taskIndex]) return;
                             openCommentModal(item.id, taskIndex);
-                        }
-                        // 履歴ボタンの処理
-                        if (button.classList.contains('history-btn')) {
-                            if (isNaN(taskIndex) || !item.tasks[taskIndex]) return;
-                            openHistoryModal(item.id, taskIndex);
                         }
                         // サブタスクの表示切り替え
                         if (button.classList.contains('subtask-toggle-btn')) {
@@ -1244,7 +1217,6 @@
                         const newText = span.textContent.trim();
 
                         if (newText && newText !== task.text) {
-                            addHistory(task, 'タスク名', task.text, newText);
                             task.text = newText;
                             span.textContent = newText; // UIにもトリムした値を反映
                             saveDataToLocalStorage();
@@ -1300,8 +1272,7 @@
                             return;
                         }
 
-                        const newTask = { text: taskText, completed: false, assignee: '未定', dueDate: dueDate, priority: '中', comments: [], history: [], subtasks: [] };
-                        addHistory(newTask, '作成', '', taskText);
+                        const newTask = { text: taskText, completed: false, assignee: '未定', dueDate: dueDate, priority: '中', comments: [], subtasks: [] };
                         item.tasks.push(newTask);
                         renderTasks(); // リスト全体を再描画
                         updateRoadmapView(item.id);
@@ -1498,60 +1469,6 @@
             commentModal.addEventListener('click', (e) => {
                 if (e.target === commentModal) {
                     closeCommentModal();
-                }
-            });
-
-            // --- 履歴モーダルのロジック ---
-            const historyModal = document.getElementById('history-modal');
-            const historyModalTaskTitle = document.getElementById('history-modal-task-title');
-            const historyList = document.getElementById('history-list');
-            const historyModalCloseBtn = document.getElementById('history-modal-close-btn');
-
-            function openHistoryModal(roadmapId, taskIndex) {
-                const task = projectData.roadmaps.find(item => item.id === roadmapId).tasks[taskIndex];
-                historyModalTaskTitle.textContent = task.text;
-                renderHistory(task.history);
-                historyModal.classList.remove('hidden');
-            }
-
-            function closeHistoryModal() {
-                historyModal.classList.add('hidden');
-            }
-
-            function renderHistory(history) {
-                historyList.innerHTML = '';
-                if (!history || history.length === 0) {
-                    historyList.innerHTML = `<p class="text-gray-500 text-sm">変更履歴はありません。</p>`;
-                    return;
-                }
-                history.forEach(entry => {
-                    const date = new Date(entry.timestamp).toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-                    let text = '';
-                    
-                    let from = entry.from;
-                    let to = entry.to;
-
-                    if (entry.action === '完了状態') {
-                        from = from ? '完了' : '未完了';
-                        to = to ? '完了' : '未完了';
-                    }
-
-                    if (entry.action === '作成') {
-                        text = `<div class="font-semibold text-gray-800">${date}</div><div class="ml-4">タスクが作成されました。</div>`;
-                    } else {
-                        text = `<div class="font-semibold text-gray-800">${date}</div><div class="ml-4">「${entry.action}」が <span class="font-medium bg-red-100 text-red-800 px-1 rounded">${from}</span> から <span class="font-medium bg-green-100 text-green-800 px-1 rounded">${to}</span> に変更されました。</div>`;
-                    }
-                    const historyEl = document.createElement('div');
-                    historyEl.className = 'text-sm text-gray-600 border-b border-gray-200 pb-2 mb-2 last:border-b-0 last:mb-0';
-                    historyEl.innerHTML = text;
-                    historyList.appendChild(historyEl);
-                });
-            }
-
-            historyModalCloseBtn.addEventListener('click', closeHistoryModal);
-            historyModal.addEventListener('click', (e) => {
-                if (e.target === historyModal) {
-                    closeHistoryModal();
                 }
             });
 
@@ -1775,21 +1692,6 @@
                     <button id="comment-modal-close-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md mr-2 hover:bg-gray-300 transition-colors">閉じる</button>
                     <button id="add-comment-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">追加</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 履歴モーダル -->
-    <div id="history-modal" class="fixed inset-0 bg-gray-800 bg-opacity-60 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg shadow-xl w-11/12 md:max-w-2xl mx-auto">
-            <div class="p-5 border-b border-gray-200 flex justify-between items-center">
-                <h3 class="text-xl font-semibold text-gray-800 truncate">変更履歴: <span id="history-modal-task-title"></span></h3>
-                <button id="history-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="history-list" class="p-5 max-h-96 overflow-y-auto space-y-3">
-                <!-- 履歴はここに挿入されます -->
             </div>
         </div>
     </div>
