@@ -64,7 +64,6 @@
             position: absolute;
             width: 20px;
             height: 20px;
-            background-color: #6b7280; /* gray-500 for not-started status */
             border: 4px solid #fff;
             top: 20px;
             border-radius: 50%;
@@ -72,6 +71,9 @@
             transition: background-color 0.5s ease; /* 色の変更を滑らかに */
         }
         /* 進捗に応じた円の色 */
+        .timeline-item.status-not-started::after {
+            background-color: #6b7280; /* gray-500 */
+        }
         .timeline-item.status-in-progress::after {
             background-color: #2563eb; /* blue-600 */
         }
@@ -181,6 +183,8 @@
             <h1 class="text-4xl font-bold mb-2 md:mb-0">AI活用推進チーム</h1>
             <nav>
                 <ul class="flex space-x-6 text-lg">
+                    <li><a href="#overall-summary" class="hover:text-slate-300 transition duration-300">全体サマリー</a></li>
+                    <li><a href="#meeting-schedule" class="hover:text-slate-300 transition duration-300">ミーティング</a></li>
                     <li><a href="#purpose-vision" class="hover:text-slate-300 transition duration-300">目的とビジョン</a></li>
                     <li><a href="#roadmap" class="hover:text-slate-300 transition duration-300">ロードマップ</a></li>
                 </ul>
@@ -190,6 +194,83 @@
 
     <!-- メインコンテンツ -->
     <main class="container mx-auto p-6 space-y-12">
+
+        <!-- 全体サマリーセクション -->
+        <section id="overall-summary" class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 mb-12 scroll-mt-24 fade-in-up">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-4 sm:mb-0">全体進捗サマリー</h2>
+                <div>
+                    <label for="summary-filter-roadmap" class="text-sm font-medium text-gray-700 mr-2">対象ロードマップ:</label>
+                    <select id="summary-filter-roadmap" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                        <option value="all">全体</option>
+                        <!-- Options will be inserted by JS -->
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                <!-- 全体進捗率 -->
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <div id="summary-progress-text" class="text-4xl font-bold text-blue-600">0%</div>
+                    <p class="text-sm font-medium text-gray-600 mt-2">全体進捗率</p>
+                </div>
+                <!-- タスク数 -->
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <div id="summary-tasks-count" class="text-4xl font-bold text-green-600">0/0</div>
+                    <p class="text-sm font-medium text-gray-600 mt-2">完了タスク数</p>
+                </div>
+                <!-- 期限切れタスク -->
+                <div class="bg-red-50 p-6 rounded-lg">
+                    <div id="summary-overdue-count" class="text-4xl font-bold text-red-600">0</div>
+                    <p class="text-sm font-medium text-gray-600 mt-2">期限切れタスク</p>
+                </div>
+                <!-- プロジェクト期間 -->
+                <div class="bg-slate-50 p-6 rounded-lg">
+                    <div id="summary-project-duration" class="text-4xl font-bold text-slate-600">...</div>
+                    <p class="text-sm font-medium text-gray-600 mt-2">プロジェクト期間</p>
+                </div>
+            </div>
+            <div class="mt-6">
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div id="summary-progress-bar" class="bg-gradient-to-r from-blue-500 to-cyan-400 h-4 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ミーティング日程セクション -->
+        <section id="meeting-schedule" class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 scroll-mt-24 fade-in-up">
+            <h2 class="text-3xl font-extrabold text-center text-slate-800 mb-6">定例ミーティング日程</h2>
+            <div class="max-w-md mx-auto">
+                <ul id="meeting-list" class="space-y-4">
+                    <!-- ミーティング日程はここに動的に挿入されます -->
+                </ul>
+                <!-- ミーティング追加UI -->
+                <div class="mt-6" id="add-meeting-ui">
+                    <div id="add-meeting-form" class="hidden space-y-3 mt-4 p-4 border rounded-lg bg-gray-50">
+                        <h4 class="font-semibold text-gray-800">新しいミーティングを追加</h4>
+                        <div>
+                            <label for="meeting-date" class="block text-sm font-medium text-gray-700">日付</label>
+                            <input type="date" id="meeting-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                        </div>
+                        <div>
+                            <label for="meeting-time" class="block text-sm font-medium text-gray-700">時間 (例: 17:30 - 18:00)</label>
+                            <input type="text" id="meeting-time" placeholder="17:30 - 18:00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                        </div>
+                        <div>
+                            <label for="meeting-minutes-url" class="block text-sm font-medium text-gray-700">議事録URL (任意)</label>
+                            <input type="url" id="meeting-minutes-url" placeholder="https://example.com/minutes" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <button id="cancel-add-meeting-btn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm hover:bg-gray-300 transition-colors">キャンセル</button>
+                            <button id="save-meeting-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition-colors">保存</button>
+                        </div>
+                    </div>
+                    <button id="add-meeting-btn" class="mt-4 w-full text-blue-600 hover:bg-blue-50 border-2 border-dashed border-blue-300 hover:border-blue-400 py-2 rounded-lg text-sm font-medium flex items-center justify-center transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        ミーティング日程を追加
+                    </button>
+                </div>
+            </div>
+        </section>
 
         <!-- 目的とビジョンセクション -->
         <section id="purpose-vision" class="bg-white p-8 rounded-xl shadow-xl border border-gray-200 scroll-mt-24">
@@ -233,6 +314,52 @@
             <h2 class="text-4xl font-extrabold text-center text-slate-800 mb-8">ロードマップ</h2>
             <p class="text-gray-700 mb-10 text-center">このロードマップは、AI活用推進チームが段階的に成果を出し、最終的なビジョンを実現するための指針です。社内の状況に合わせて柔軟に調整してください。</p>
 
+            <!-- フィルターセクション -->
+            <div id="filter-controls" class="p-4 mb-6 bg-slate-50 rounded-lg border border-slate-200">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div>
+                        <label for="filter-keyword" class="block text-sm font-medium text-gray-700">キーワード</label>
+                        <input type="text" id="filter-keyword" placeholder="タスク名で検索..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                    </div>
+                    <div>
+                        <label for="filter-assignee" class="block text-sm font-medium text-gray-700">担当者</label>
+                        <select id="filter-assignee" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                            <option value="all">すべての担当者</option>
+                            <!-- Options will be inserted by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-status" class="block text-sm font-medium text-gray-700">ステータス</label>
+                        <select id="filter-status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                            <option value="all">すべて</option>
+                            <option value="incomplete">未完了</option>
+                            <option value="complete">完了</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-due-date" class="block text-sm font-medium text-gray-700">期限</label>
+                        <select id="filter-due-date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                            <option value="all">すべて</option>
+                            <option value="overdue">期限切れ</option>
+                            <option value="today">今日まで</option>
+                            <option value="this_week">今週中</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-priority" class="block text-sm font-medium text-gray-700">優先度</label>
+                        <select id="filter-priority" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-sm">
+                            <option value="all">すべて</option>
+                            <option value="高">高</option>
+                            <option value="中">中</option>
+                            <option value="低">低</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4 text-right">
+                    <button id="reset-filters-btn" class="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">フィルターをリセット</button>
+                </div>
+            </div>
+
             <div class="text-right mb-6">
                 <button id="export-csv-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md shadow-sm inline-flex items-center transition-colors duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -246,7 +373,7 @@
                 <!-- 短期ロードマップ 1 -->
                 <div class="timeline-item fade-in-up" data-roadmap-id="short-1">
                     <div class="timeline-content bg-white">
-                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">短期ロードマップ 1（2025年8月〜2025年10月）</h3>
+                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">短期ロードマップ 1（2025/08/01〜2025/10/31）</h3>
                         <!-- 担当者と進捗状況 -->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-sm space-y-2 sm:space-y-0">
                             <div class="flex items-center">
@@ -311,7 +438,7 @@
                 <!-- 短期ロードマップ 2 -->
                 <div class="timeline-item fade-in-up" data-roadmap-id="short-2">
                     <div class="timeline-content bg-white">
-                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">短期ロードマップ 2（2025年11月〜2026年4月）</h3>
+                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">短期ロードマップ 2（2025/11/01〜2026/04/30）</h3>
                         <!-- 担当者と進捗状況 -->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-sm space-y-2 sm:space-y-0">
                             <div class="flex items-center">
@@ -376,7 +503,7 @@
                 <!-- 中期ロードマップ -->
                 <div class="timeline-item fade-in-up" data-roadmap-id="medium-1">
                     <div class="timeline-content bg-white">
-                        <h3 class="text-2xl font-semibold text-sky-700 mb-3">中期ロードマップ（2026年5月〜2027年4月）</h3>
+                        <h3 class="text-2xl font-semibold text-sky-700 mb-3">中期ロードマップ（2026/05/01〜2027/04/30）</h3>
                         <!-- 担当者と進捗状況 -->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 text-sm space-y-2 sm:space-y-0">
                             <div class="flex items-center">
@@ -523,6 +650,22 @@
             // フッターの年を動的に更新
             document.getElementById('current-year').textContent = new Date().getFullYear();
 
+            // --- ロードマップのタイトル ---
+            const roadmapShortTitles = {
+                'short-1': '短期ロードマップ 1',
+                'short-2': '短期ロードマップ 2',
+                'medium-1': '中期ロードマップ',
+                'long-1': '長期ロードマップ'
+            };
+
+            // --- ロードマップの期間 ---
+            const roadmapDurations = {
+                'short-1': '2025/08/01〜2025/10/31',
+                'short-2': '2025/11/01〜2026/04/30',
+                'medium-1': '2026/05/01〜2027/04/30',
+                'long-1': '2027年5月〜'
+            };
+
             // --- 担当者リスト ---
             // このリストを編集すると、タスクの担当者選択肢に反映されます。
             const teamMembers = [
@@ -540,7 +683,7 @@
             // --- データの保存と読み込み ---
             function saveDataToLocalStorage() {
                 try {
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roadmapData));
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(projectData));
                 } catch (e) {
                     console.error("ローカルストレージへのデータ保存に失敗しました:", e);
                 }
@@ -548,15 +691,15 @@
 
             function loadDataFromLocalStorage() {
                 const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-                if (savedData) {
-                    try {
-                        return JSON.parse(savedData);
-                    } catch (e) {
-                        console.error("ローカルストレージのデータ解析に失敗しました:", e);
-                    }
-                }
-                // 保存されたデータがない、または解析に失敗した場合はデフォルトデータを返す
-                return [
+                const defaultMeetings = [
+                    { date: '2025-08-06', time: '17:30 - 18:00', minutesUrl: '#' },
+                    { date: '2025-08-21', time: '11:30 - 12:00', minutesUrl: '#' },
+                    { date: '2025-09-04', time: '12:00 - 12:30', minutesUrl: '#' },
+                    { date: '2025-09-17', time: '17:30 - 18:00', minutesUrl: '#' },
+                    { date: '2025-10-07', time: '14:00 - 14:30', minutesUrl: '#' },
+                    { date: '2025-10-22', time: '17:30 - 18:00', minutesUrl: '#' },
+                ];
+                const defaultRoadmaps = [
                     { 
                         id: 'short-1', 
                         mainAssignee: '企画部',
@@ -595,11 +738,29 @@
                         ]
                     },
                 ];
+
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        // 古いデータ形式（ロードマップの配列）からの移行
+                        if (Array.isArray(data)) {
+                            return { roadmaps: data, meetings: defaultMeetings };
+                        }
+                        // 新しいデータ形式（オブジェクト）
+                        if (data.roadmaps && data.meetings) {
+                            return data;
+                        }
+                    } catch (e) {
+                        console.error("ローカルストレージのデータ解析に失敗しました:", e);
+                    }
+                }
+                // 保存されたデータがない、または解析に失敗した場合はデフォルトデータを返す
+                return { roadmaps: defaultRoadmaps, meetings: defaultMeetings };
             }
 
-            // --- ロードマップデータ ---
-            // タスクの完了状態、担当者、期限を変更すると、UIが自動で更新されます。
-            let roadmapData = loadDataFromLocalStorage();
+            // --- プロジェクトデータ ---
+            let projectData = loadDataFromLocalStorage();
+            let roadmapData = projectData.roadmaps; // 既存コードとの互換性のため
 
             // --- 履歴記録関数 ---
             function addHistory(task, action, from, to) {
@@ -615,6 +776,48 @@
                 task.history.unshift(newHistory); // 最新の履歴を先頭に追加
             }
 
+            // --- 全体サマリーを更新する関数 ---
+            function updateOverallSummary() {
+                const roadmapId = document.getElementById('summary-filter-roadmap').value;
+
+                let targetTasks;
+                if (roadmapId === 'all') {
+                    targetTasks = projectData.roadmaps.flatMap(item => item.tasks);
+                } else {
+                    const roadmap = projectData.roadmaps.find(item => item.id === roadmapId);
+                    targetTasks = roadmap ? roadmap.tasks : [];
+                }
+
+                const totalTasks = targetTasks.length;
+                const completedTasks = targetTasks.filter(task => task.completed).length;
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const overdueTasks = targetTasks.filter(task => new Date(task.dueDate) < today && !task.completed).length;
+
+                const overallProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+                // プロジェクト期間の計算
+                let durationText = '---';
+                if (roadmapId === 'all') {
+                    const allDueDates = targetTasks.map(task => new Date(task.dueDate)).filter(date => !isNaN(date));
+                    if (allDueDates.length > 0) {
+                        const startDate = new Date(Math.min.apply(null, allDueDates));
+                        const endDate = new Date(Math.max.apply(null, allDueDates));
+                        durationText = `${startDate.toLocaleDateString('ja-JP')} ~ ${endDate.toLocaleDateString('ja-JP')}`;
+                    }
+                } else {
+                    durationText = roadmapDurations[roadmapId] || '---';
+                }
+
+                // UI要素の更新
+                document.getElementById('summary-progress-text').textContent = `${overallProgress}%`;
+                document.getElementById('summary-progress-bar').style.width = `${overallProgress}%`;
+                document.getElementById('summary-tasks-count').textContent = `${completedTasks}/${totalTasks}`;
+                document.getElementById('summary-overdue-count').textContent = overdueTasks;
+                document.getElementById('summary-project-duration').textContent = durationText;
+            }
+
             // 進捗状況を計算する関数
             function calculateProgress(tasks) {
                 if (!tasks || tasks.length === 0) return { progress: 0, status: '未着手' };
@@ -628,7 +831,7 @@
 
             // 特定のロードマップの表示を更新する関数
             function updateRoadmapView(roadmapId) {
-                const roadmapItemData = roadmapData.find(item => item.id === roadmapId);
+                const roadmapItemData = projectData.roadmaps.find(item => item.id === roadmapId);
                 if (!roadmapItemData) return;
 
                 const { progress, status } = calculateProgress(roadmapItemData.tasks);
@@ -658,7 +861,7 @@
             }
 
             // タスクのHTML要素を生成する関数
-            function createTaskElement(task, index) {
+            function createTaskElement(task, index, roadmapId) {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 const dueDate = new Date(task.dueDate);
@@ -681,6 +884,8 @@
 
                 const taskRow = document.createElement('div');
                 taskRow.className = `task-row flex items-center justify-between py-1 border-b border-gray-100 cursor-move ${priorityClass}`;
+                taskRow.dataset.roadmapId = roadmapId;
+                taskRow.dataset.taskIndex = index;
                 taskRow.innerHTML = `
                     <div class="flex items-center text-gray-700 flex-grow min-w-0">
                         <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 shrink-0 cursor-pointer" data-task-index="${index}" ${task.completed ? 'checked' : ''}>
@@ -709,12 +914,92 @@
                 return taskRow;
             }
 
+            // --- フィルター関連のロジック ---
+            const filterKeyword = document.getElementById('filter-keyword');
+            const filterAssignee = document.getElementById('filter-assignee');
+            const filterStatus = document.getElementById('filter-status');
+            const filterDueDate = document.getElementById('filter-due-date');
+            const filterPriority = document.getElementById('filter-priority');
+            const resetFiltersBtn = document.getElementById('reset-filters-btn');
+            const summaryFilterRoadmap = document.getElementById('summary-filter-roadmap');
+
+            function populateAssigneeFilter() {
+                const sortedMembers = [...teamMembers].sort((a, b) => a.localeCompare(b, 'ja'));
+                filterAssignee.innerHTML = '<option value="all">すべての担当者</option>';
+                sortedMembers.forEach(assignee => {
+                    const option = document.createElement('option');
+                    option.value = assignee;
+                    option.textContent = assignee;
+                    filterAssignee.appendChild(option);
+                });
+            }
+
+            function populateSummaryFilter() {
+                summaryFilterRoadmap.innerHTML = '<option value="all">全体</option>';
+                projectData.roadmaps.forEach(roadmap => {
+                    const option = document.createElement('option');
+                    option.value = roadmap.id;
+                    option.textContent = roadmapShortTitles[roadmap.id] || roadmap.id;
+                    summaryFilterRoadmap.appendChild(option);
+                });
+            }
+
+            function applyFilters() {
+                const keyword = filterKeyword.value.toLowerCase();
+                const assignee = filterAssignee.value;
+                const status = filterStatus.value;
+                const dueDateFilter = filterDueDate.value;
+                const priority = filterPriority.value;
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const endOfWeek = new Date(today);
+                endOfWeek.setDate(today.getDate() + (7 - today.getDay()) % 7);
+
+                document.querySelectorAll('.task-row').forEach(taskRow => {
+                    const roadmapId = taskRow.dataset.roadmapId;
+                    const taskIndex = parseInt(taskRow.dataset.taskIndex, 10);
+                    const task = projectData.roadmaps.find(item => item.id === roadmapId)?.tasks[taskIndex];
+
+                    if (!task) {
+                        taskRow.classList.add('hidden');
+                        return;
+                    }
+
+                    const keywordMatch = !keyword || task.text.toLowerCase().includes(keyword);
+                    const assigneeMatch = assignee === 'all' || task.assignee === assignee;
+                    const priorityMatch = priority === 'all' || task.priority === priority;
+                    const statusMatch = status === 'all' || (status === 'complete' && task.completed) || (status === 'incomplete' && !task.completed);
+                    
+                    const taskDueDate = new Date(task.dueDate);
+                    const dueDateMatch = dueDateFilter === 'all' ||
+                        (dueDateFilter === 'overdue' && taskDueDate < today && !task.completed) ||
+                        (dueDateFilter === 'today' && taskDueDate.getTime() === today.getTime()) ||
+                        (dueDateFilter === 'this_week' && taskDueDate >= today && taskDueDate <= endOfWeek);
+
+                    taskRow.classList.toggle('hidden', !(keywordMatch && assigneeMatch && statusMatch && dueDateMatch && priorityMatch));
+                });
+            }
+
+            [filterKeyword, filterAssignee, filterStatus, filterDueDate, filterPriority].forEach(el => el.addEventListener('input', applyFilters));
+            resetFiltersBtn.addEventListener('click', () => {
+                filterKeyword.value = '';
+                filterAssignee.value = 'all';
+                filterStatus.value = 'all';
+                filterDueDate.value = 'all';
+                filterPriority.value = 'all';
+                applyFilters();
+            });
+            summaryFilterRoadmap.addEventListener('change', () => {
+                updateOverallSummary();
+            });
+
             // 初期表示を生成する関数
             function initializeViews() {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0); // 時刻をリセットして日付のみで比較
 
-                roadmapData.forEach(item => {
+                projectData.roadmaps.forEach(item => {
                     const roadmapElement = document.querySelector(`[data-roadmap-id="${item.id}"]`);
                     const taskContainer = roadmapElement.querySelector('[data-task-container]');
                     const mainAssigneeSelect = roadmapElement.querySelector('[data-main-assignee-select]');
@@ -737,16 +1022,17 @@
                         });
                     }
                     
-                    // タスクリストを再描画する関数
-                    const rerenderTasks = () => {
+                    // タスクリストを描画/再描画する関数
+                    const renderTasks = () => {
                         taskContainer.innerHTML = ''; // コンテナをクリア
                         item.tasks.forEach((task, index) => {
-                            const taskElement = createTaskElement(task, index);
+                            const taskElement = createTaskElement(task, index, item.id);
                             taskContainer.appendChild(taskElement);
                         });
+                        applyFilters(); // 描画後にフィルターを適用
                     };
 
-                    rerenderTasks(); // タスクリストの初期描画
+                    renderTasks(); // タスクリストの初期描画
 
                     // --- タスクの変更イベントリスナー ---
                     taskContainer.addEventListener('change', (e) => {
@@ -760,22 +1046,11 @@
                         if (target.type === 'checkbox') {
                             addHistory(task, '完了状態', task.completed, target.checked);
                             task.completed = target.checked;
-
-                            // スタイルの更新
-                            const taskRow = target.closest('.task-row');
-                            const taskTextSpan = taskRow.querySelector('.task-text');
-                            taskTextSpan.classList.toggle('line-through', task.completed);
-                            taskTextSpan.classList.toggle('text-gray-500', task.completed);
-
-                            // 期限切れスタイルの更新
-                            const datePicker = taskRow.querySelector('.due-date-picker');
-                            const newDueDate = new Date(task.dueDate);
-                            const newIsOverdue = newDueDate < today && !task.completed;
-                            datePicker.classList.toggle('text-red-500', newIsOverdue);
-                            datePicker.classList.toggle('font-semibold', newIsOverdue);
-
+                            // UI全体を再描画してスタイルを更新
+                            renderTasks();
                             // 全体の進捗バーを更新
                             updateRoadmapView(item.id);
+                            updateOverallSummary();
                             saveDataToLocalStorage();
                         } else if (target.tagName === 'SELECT' && target.classList.contains('assignee-select')) {
                             addHistory(task, '担当者', task.assignee, target.value);
@@ -784,10 +1059,8 @@
                         } else if (target.type === 'date' && target.classList.contains('due-date-picker')) {
                             addHistory(task, '期限日', task.dueDate, target.value);
                             task.dueDate = target.value;
-                            const newDueDate = new Date(task.dueDate);
-                            const newIsOverdue = newDueDate < today && !task.completed;
-                            target.classList.toggle('text-red-500', newIsOverdue);
-                            target.classList.toggle('font-semibold', newIsOverdue);
+                            renderTasks(); // 期限切れスタイルを更新するために再描画
+                            updateOverallSummary();
                             saveDataToLocalStorage();
                         } else if (target.tagName === 'SELECT' && target.classList.contains('priority-select')) {
                             const newPriority = target.value;
@@ -795,9 +1068,7 @@
                             task.priority = newPriority;
                             
                             const priorities = { '高': 'high', '中': 'medium', '低': 'low' };
-                            const taskRow = target.closest('.task-row');
-                            taskRow.classList.remove('priority-high', 'priority-medium', 'priority-low');
-                            taskRow.classList.add(`priority-${priorities[newPriority]}`);
+                            renderTasks(); // 優先度インジケータの色を更新するために再描画
                             saveDataToLocalStorage();
                         }
                     });
@@ -819,10 +1090,11 @@
                             item.tasks.splice(taskIndex, 1);
                             
                             // UIを再描画してリストから削除
-                            rerenderTasks();
+                            renderTasks();
 
                             // ロードマップ全体の進捗を更新
                             updateRoadmapView(item.id);
+                            updateOverallSummary();
                             saveDataToLocalStorage();
                         }
                         }
@@ -924,10 +1196,9 @@
                         const newTask = { text: taskText, completed: false, assignee: '未定', dueDate: dueDate, priority: '中', comments: [], history: [] };
                         addHistory(newTask, '作成', '', taskText);
                         item.tasks.push(newTask);
-                        // 追加したタスクをリストの最後に描画
-                        const taskElement = createTaskElement(newTask, item.tasks.length - 1);
-                        taskContainer.appendChild(taskElement);
+                        renderTasks(); // リスト全体を再描画
                         updateRoadmapView(item.id);
+                        updateOverallSummary();
                         saveDataToLocalStorage();
                         cancelAddTaskBtn.click(); // フォームをリセットして閉じる
                     });
@@ -943,7 +1214,7 @@
                             item.tasks.splice(evt.newIndex, 0, movedTask);
 
                             // DOMのインデックスを更新するために再描画
-                            rerenderTasks();
+                            renderTasks();
                             saveDataToLocalStorage();
                         }
                     });
@@ -951,6 +1222,11 @@
                     // --- 初期の進捗表示 ---
                     updateRoadmapView(item.id);
                 });
+                populateAssigneeFilter();
+                populateSummaryFilter();
+                updateOverallSummary();
+                initializeMeetings();
+                applyFilters();
             }
 
             // --- コメントモーダルのロジック ---
@@ -962,7 +1238,7 @@
             const commentModalCloseBtn = document.getElementById('comment-modal-close-btn');
 
             function openCommentModal(roadmapId, taskIndex) {
-                const task = roadmapData.find(item => item.id === roadmapId).tasks[taskIndex];
+                const task = projectData.roadmaps.find(item => item.id === roadmapId).tasks[taskIndex];
                 commentModal.dataset.roadmapId = roadmapId;
                 commentModal.dataset.taskIndex = taskIndex;
                 commentModalTaskTitle.textContent = task.text;
@@ -1002,7 +1278,7 @@
                 const commentText = commentTextarea.value.trim();
 
                 if (commentText) {
-                    const task = roadmapData.find(item => item.id === roadmapId).tasks[taskIndex];
+                    const task = projectData.roadmaps.find(item => item.id === roadmapId).tasks[taskIndex];
                     task.comments.push(commentText);
                     saveDataToLocalStorage();
                     renderComments(task.comments);
@@ -1028,7 +1304,7 @@
 
                 if (isNaN(commentIndex) || !roadmapId || isNaN(taskIndex)) return;
 
-                const task = roadmapData.find(item => item.id === roadmapId).tasks[taskIndex];
+                const task = projectData.roadmaps.find(item => item.id === roadmapId).tasks[taskIndex];
                 const commentToDelete = task.comments[commentIndex];
 
                 if (confirm(`コメント「${commentToDelete.substring(0, 20)}...」を削除しますか？`)) {
@@ -1065,7 +1341,7 @@
             const historyModalCloseBtn = document.getElementById('history-modal-close-btn');
 
             function openHistoryModal(roadmapId, taskIndex) {
-                const task = roadmapData.find(item => item.id === roadmapId).tasks[taskIndex];
+                const task = projectData.roadmaps.find(item => item.id === roadmapId).tasks[taskIndex];
                 historyModalTaskTitle.textContent = task.text;
                 renderHistory(task.history);
                 historyModal.classList.remove('hidden');
@@ -1115,13 +1391,6 @@
             // --- CSVエクスポートのロジック ---
             const exportCsvBtn = document.getElementById('export-csv-btn');
             exportCsvBtn.addEventListener('click', () => {
-                const roadmapTitles = {
-                    'short-1': '短期ロードマップ 1（2025年8月〜2025年10月）',
-                    'short-2': '短期ロードマップ 2（2025年11月〜2026年4月）',
-                    'medium-1': '中期ロードマップ（2026年5月〜2027年4月）',
-                    'long-1': '長期ロードマップ（2027年5月〜）'
-                };
-
                 const headers = ['ロードマップ名', 'タスク名', '完了状態', '担当者', '期限日', '優先度', 'コメント'];
 
                 const escapeCsvCell = (cell) => {
@@ -1134,8 +1403,10 @@
 
                 const csvRows = [headers.join(',')];
 
-                roadmapData.forEach(roadmapItem => {
-                    const roadmapName = roadmapTitles[roadmapItem.id] || roadmapItem.id;
+                projectData.roadmaps.forEach(roadmapItem => {
+                    // ロードマップのフルタイトルを取得
+                    const roadmapElement = document.querySelector(`.timeline-item[data-roadmap-id="${roadmapItem.id}"] h3`);
+                    const roadmapName = roadmapElement ? roadmapElement.textContent : roadmapItem.id;
                     roadmapItem.tasks.forEach(task => {
                         const row = [
                             roadmapName,
@@ -1161,6 +1432,61 @@
                 link.click();
                 document.body.removeChild(link);
             });
+
+            function initializeMeetings() {
+                const meetingList = document.getElementById('meeting-list');
+                const addMeetingBtn = document.getElementById('add-meeting-btn');
+                const addMeetingForm = document.getElementById('add-meeting-form');
+                const saveMeetingBtn = document.getElementById('save-meeting-btn');
+                const cancelAddMeetingBtn = document.getElementById('cancel-add-meeting-btn');
+                const meetingDateInput = document.getElementById('meeting-date');
+                const meetingTimeInput = document.getElementById('meeting-time');
+                const meetingMinutesUrlInput = document.getElementById('meeting-minutes-url');
+
+                function renderMeetingList() {
+                    meetingList.innerHTML = '';
+                    if (!projectData.meetings || projectData.meetings.length === 0) {
+                        meetingList.innerHTML = `<p class="text-gray-500 text-center py-4">ミーティング日程はありません。</p>`;
+                        return;
+                    }
+
+                    projectData.meetings.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                    projectData.meetings.forEach((meeting, index) => {
+                        const date = new Date(meeting.date);
+                        const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][date.getUTCDay()];
+                        const formattedDate = `${date.getUTCFullYear()}/${String(date.getUTCMonth() + 1).padStart(2, '0')}/${String(date.getUTCDate()).padStart(2, '0')} (${dayOfWeek})`;
+
+                        const li = document.createElement('li');
+                        li.className = 'flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors';
+                            li.innerHTML = `
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-4 text-slate-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                <div class="text-lg">
+                                    <span class="font-bold text-slate-700">${formattedDate}</span>
+                                    <span class="ml-4 text-slate-600">${meeting.time}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center shrink-0 ml-4">
+                                <a href="${meeting.minutesUrl || '#'}" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors flex items-center ${!meeting.minutesUrl || meeting.minutesUrl === '#' ? 'hidden' : ''}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" /><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" /></svg>
+                                    議事録
+                                </a>
+                                <button class="delete-meeting-btn text-gray-400 hover:text-red-500 transition-colors p-1 rounded-full ml-2" data-index="${index}" title="ミーティングを削除">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style="pointer-events: none;"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                                </button>
+                            </div>`;
+                        meetingList.appendChild(li);
+                    });
+                }
+
+                addMeetingBtn.addEventListener('click', () => { addMeetingForm.classList.remove('hidden'); addMeetingBtn.classList.add('hidden'); });
+                cancelAddMeetingBtn.addEventListener('click', () => { addMeetingForm.classList.add('hidden'); addMeetingBtn.classList.remove('hidden'); meetingDateInput.value = ''; meetingTimeInput.value = ''; meetingMinutesUrlInput.value = ''; });
+                saveMeetingBtn.addEventListener('click', () => { const date = meetingDateInput.value; const time = meetingTimeInput.value.trim(); const minutesUrl = meetingMinutesUrlInput.value.trim(); if (!date || !time) { alert('日付と時間を入力してください。'); return; } projectData.meetings.push({ date, time, minutesUrl }); saveDataToLocalStorage(); renderMeetingList(); cancelAddMeetingBtn.click(); });
+                meetingList.addEventListener('click', (e) => { const deleteBtn = e.target.closest('.delete-meeting-btn'); if (!deleteBtn) return; const index = parseInt(deleteBtn.dataset.index, 10); if (isNaN(index)) return; const meeting = projectData.meetings[index]; if (confirm(`ミーティング（${meeting.date} ${meeting.time}）を削除しますか？`)) { projectData.meetings.splice(index, 1); saveDataToLocalStorage(); renderMeetingList(); } });
+
+                renderMeetingList();
+            }
 
             initializeViews();
 
